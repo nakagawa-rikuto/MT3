@@ -1,6 +1,34 @@
 #include <Novice.h>
+#include "AffineMatrix4x4.h"
 
 const char kWindowTitle[] = "LC1B_17_ナカガワ_リクト_タイトル_";
+
+// Vector3の数値表示
+void VectorScreenPritf(int x, int y, const Vector3& vector, const char* label) {
+
+	static const int kColumnWidth = 60;
+
+	Novice::ScreenPrintf(x, y, "%.02f", vector.x);
+	Novice::ScreenPrintf(x + kColumnWidth, y, "%.02f", vector.y);
+	Novice::ScreenPrintf(x + kColumnWidth * 2, y, "%.02f", vector.z);
+	Novice::ScreenPrintf(x + kColumnWidth * 3, y, "%s", label);
+}
+
+//4x4行列の数値表示
+void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix) {
+
+	static const int kRowHeight = 20;
+	static const int kColumnWidth = 60;
+
+	for (int row = 0; row < 4; ++row) {
+		for (int col = 0; col < 4; ++col) {
+
+			Novice::ScreenPrintf(
+				x + col * kColumnWidth, y + row * kRowHeight, "%6.02f", matrix.m[row][col]
+			);
+		}
+	}
+}
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
@@ -11,6 +39,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// キー入力結果を受け取る箱
 	char keys[256] = {0};
 	char preKeys[256] = {0};
+
+	AffineMatrix4x4 affine;
+
+	// クロス積
+	Vector3 Cross(const Vector3 & v1, const Vector3 & v2);
+
+	// クロス積の確認用
+	Vector3 v1 = { 1.2f, -3.9f, 2.5f };
+	Vector3 v2 = { 2.8f, 0.4f, -1.3f };
+	Vector3 cross = Cross(v1, v2);
+
+	Vector3 rotate = {};
+	Vector3 translate = {};
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -24,6 +65,36 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 		/// ↓更新処理ここから
 		///
+		
+		/// **********************************************************
+		/// キー入力
+		/// **********************************************************
+		if (keys[DIK_W] && !preKeys[DIK_W]) {
+
+			translate.y += 4.0f;
+		}
+
+		if (keys[DIK_S] && !preKeys[DIK_S]) {
+
+			translate.y -= 4.0f;
+		}
+
+		if (keys[DIK_A] && !preKeys[DIK_A]) {
+
+			translate.x -= 4.0f;
+		}
+
+		if (keys[DIK_D] && !preKeys[DIK_D]) {
+
+			translate.x += 4.0f;
+		}
+
+		/// 回転
+		rotate.y += 0.05f;
+
+		// 各種行列の計算
+		Matrix4x4 worldMatrix = affine.MakeAffineMatrix({ 1.0f, 1.0f,1.0f }, rotate, translate);
+		Matrix4x4 cameraMatrix = affine.MakeAffineMatrix({ 1.0f, 1.0f, 1.0f, }, { 0.0f,0.0f,0.0f }, { 100.0f,100.0f,0.0f });
 
 		///
 		/// ↑更新処理ここまで
@@ -32,6 +103,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 		/// ↓描画処理ここから
 		///
+
+		// クロス積の確認用
+		VectorScreenPritf(0, 0, cross, "Cross");
 
 		///
 		/// ↑描画処理ここまで
