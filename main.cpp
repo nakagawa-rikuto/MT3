@@ -1,5 +1,5 @@
 #include <Novice.h>
-#include "AffineMatrix4x4.h"
+#include "MyMath.h"
 
 const char kWindowTitle[] = "LC1B_17_ナカガワ_リクト_タイトル_";
 
@@ -40,8 +40,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	char keys[256] = {0};
 	char preKeys[256] = {0};
 
-	AffineMatrix4x4 affine;
-
 	// クロス積
 	Vector3 Cross(const Vector3 & v1, const Vector3 & v2);
 
@@ -52,6 +50,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	Vector3 rotate = {};
 	Vector3 translate = {};
+	Vector3 screenVertices[3];
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -93,8 +92,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		rotate.y += 0.05f;
 
 		// 各種行列の計算
-		Matrix4x4 worldMatrix = affine.MakeAffineMatrix({ 1.0f, 1.0f,1.0f }, rotate, translate);
-		Matrix4x4 cameraMatrix = affine.MakeAffineMatrix({ 1.0f, 1.0f, 1.0f, }, { 0.0f,0.0f,0.0f }, { 100.0f,100.0f,0.0f });
+		Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f, 1.0f,1.0f }, rotate, translate);
+		Matrix4x4 cameraMatrix = MakeAffineMatrix({ 1.0f, 1.0f, 1.0f, }, { 0.0f,0.0f,0.0f }, { 100.0f,100.0f,0.0f });
+		Matrix4x4 viewMatrix = Inverse(cameraMatrix);
+		Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, 1280.0f / 780.0f, 0.1f, 100.0f);
+		Matrix4x4 worldViewProjectionMatix = Mutiply(worldMatrix, Mutiply(viewMatrix, projectionMatrix));
+		Matrix4x4 viewportMatrix = MakeViewportMatrix(0, 0, 1280.0f, 780.0f, 0.0f, 1.0f);
+		
+		for (uint32_t i = 0; i < 3; ++i) {
+			Vector3 ndcVertex = Transform(kLocalVertices[1])
+		}
 
 		///
 		/// ↑更新処理ここまで
