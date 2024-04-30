@@ -75,12 +75,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// **********************************************************
 		if (keys[DIK_W] ) {
 
-			translate.y += 0.02f;
+			translate.z += 0.1f;
 		}
 
 		if (keys[DIK_S] ) {
 
-			translate.y -= 0.02f;
+			translate.z -= 0.1f;
 		}
 
 		if (keys[DIK_A] ) {
