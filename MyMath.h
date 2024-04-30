@@ -4,52 +4,52 @@
 #include <cmath>
 #include <assert.h>
 
-// •½sˆÚ“®
+// å¹³è¡Œç§»å‹•
 Matrix4x4 MakeTranslateMatrix(const Vector3& translate);
 
-// Šgks—ñ
+// æ‹¡ç¸®è¡Œåˆ—
 Matrix4x4 MakeScalseMatrix(const Vector3& scale);
 
-// X²‰ñ“]s—ñ
+// Xè»¸å›è»¢è¡Œåˆ—
 Matrix4x4 MakeRotateXMatrix(float radian);
 
-// Y²‰ñ“]s—ñ
+// Yè»¸å›è»¢è¡Œåˆ—
 Matrix4x4 MakeRotateYMatrix(float radian);
 
-// Z²‰ñ“]s—ñ
+// Zè»¸å›è»¢è¡Œåˆ—
 Matrix4x4 MakeRotateZMatrix(float radian);
 
-// s—ñ“¯m‚ÌŠ|‚¯Z
+// è¡Œåˆ—åŒå£«ã®æ›ã‘ç®—
 Matrix4x4 Mutiply(const Matrix4x4& m1, const Matrix4x4& m2);
 
-// 3ŸŒ³ƒAƒtƒBƒ“•ÏŠ·s—ñ
+// 3æ¬¡å…ƒã‚¢ãƒ•ã‚£ãƒ³å¤‰æ›è¡Œåˆ—
 Matrix4x4 MakeAffineMatrix(
 	const Vector3& scale, const Vector3& rotate, const Vector3& translate);
 
-// ƒNƒƒXÏ
+// ã‚¯ãƒ­ã‚¹ç©
 Vector3 Cross(const Vector3& v1, const Vector3& v2);
 
-// ’PˆÊs—ñ‚Ìì¬
+// å˜ä½è¡Œåˆ—ã®ä½œæˆ
 Matrix4x4 MakeIdenitiy4x4();
 
-// “]’us—ñ
+// è»¢ç½®è¡Œåˆ—
 Matrix4x4 TransposeMatrix(const Matrix4x4& m);
 
-// ƒrƒ…[ƒ|[ƒg•ÏŠ·s—ñ
+// ãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆå¤‰æ›è¡Œåˆ—
 Matrix4x4 MakeViewportMatrix(
 	float left, float top, float width, float height, float minDepth, float maxDepth);
 
-// “§‹‰es—ñ
+// é€è¦–å½±è¡Œåˆ—
 Matrix4x4 MakePerspectiveFovMatrix(
 	float fovY, float aspectRatio, float nearClip, float farClip);
 
-// ³Ë‰es—ñ
+// æ­£å°„å½±è¡Œåˆ—
 Matrix4x4 MakeOrethographicMatrx(
 	float left, float top, float right, float bottom, float nearClip, float farClip);
 
-// ‹ts—ñ
+// é€†è¡Œåˆ—
 Matrix4x4 Inverse(const Matrix4x4& m);
 
-// À•W•ÏŠ·
-Matrix4x4 
+// åº§æ¨™å¤‰æ›
+Vector3 Transform(Vector3 vector, Matrix4x4 matrix);
 

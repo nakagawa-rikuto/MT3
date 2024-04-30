@@ -51,6 +51,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3 rotate = {};
 	Vector3 translate = {};
 	Vector3 screenVertices[3];
+	Vector3 kLocalVertices[3] = {
+		{0.0f, 1.0f, 0.0f},
+		{1.0f, -1.0f, 0.0f},
+		{-1.0f, -1.0f, 0.0f}
+	};
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -68,24 +73,24 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// **********************************************************
 		/// キー入力
 		/// **********************************************************
-		if (keys[DIK_W] && !preKeys[DIK_W]) {
+		if (keys[DIK_W] ) {
 
-			translate.y += 4.0f;
+			translate.y += 0.02f;
 		}
 
-		if (keys[DIK_S] && !preKeys[DIK_S]) {
+		if (keys[DIK_S] ) {
 
-			translate.y -= 4.0f;
+			translate.y -= 0.02f;
 		}
 
-		if (keys[DIK_A] && !preKeys[DIK_A]) {
+		if (keys[DIK_A] ) {
 
-			translate.x -= 4.0f;
+			translate.x -= 0.02f;
 		}
 
-		if (keys[DIK_D] && !preKeys[DIK_D]) {
+		if (keys[DIK_D] ) {
 
-			translate.x += 4.0f;
+			translate.x += 0.02f;
 		}
 
 		/// 回転
@@ -93,14 +98,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		// 各種行列の計算
 		Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f, 1.0f,1.0f }, rotate, translate);
-		Matrix4x4 cameraMatrix = MakeAffineMatrix({ 1.0f, 1.0f, 1.0f, }, { 0.0f,0.0f,0.0f }, { 100.0f,100.0f,0.0f });
+		Matrix4x4 cameraMatrix = MakeAffineMatrix({ 1.0f, 1.0f, 1.0f, }, { 0.0f,0.0f,0.0f }, { 0.0f,0.0f,-8.0f });
 		Matrix4x4 viewMatrix = Inverse(cameraMatrix);
 		Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, 1280.0f / 780.0f, 0.1f, 100.0f);
 		Matrix4x4 worldViewProjectionMatix = Mutiply(worldMatrix, Mutiply(viewMatrix, projectionMatrix));
 		Matrix4x4 viewportMatrix = MakeViewportMatrix(0, 0, 1280.0f, 780.0f, 0.0f, 1.0f);
 		
 		for (uint32_t i = 0; i < 3; ++i) {
-			Vector3 ndcVertex = Transform(kLocalVertices[1])
+			Vector3 ndcVertex = Transform(kLocalVertices[i], worldViewProjectionMatix);
+			screenVertices[i] = Transform(ndcVertex, viewportMatrix);
 		}
 
 		///
@@ -110,6 +116,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 		/// ↓描画処理ここから
 		///
+
+		// 描画
+		Novice::DrawTriangle(
+			int(screenVertices[0].x), int(screenVertices[0].y), int(screenVertices[1].x),
+			int(screenVertices[1].y), int(screenVertices[2].x), int(screenVertices[2].y), RED, kFillModeSolid
+		);
 
 		// クロス積の確認用
 		VectorScreenPritf(0, 0, cross, "Cross");
