@@ -26,8 +26,8 @@ Matrix4x4 MakeScalseMatrix(const Vector3& scale) {
 
 Matrix4x4 MakeRotateXMatrix(float radian) {
 
-	/*ŠO‘¤‚Ì’†‚©‚Á‚±‚ÍAMatrix4x4\‘¢‘Ì‚Ì‰Šú‰»‚ğ•\‚µ‚Ä‚¨‚èA
-	  “à‘¤‚Ì’†‚©‚Á‚±‚Í”z—ñ‚Ì‰Šú‰»‚ğ•\‚µ‚Ä‚¢‚Ü‚·B*/
+	/*å¤–å´ã®ä¸­ã‹ã£ã“ã¯ã€Matrix4x4æ§‹é€ ä½“ã®åˆæœŸåŒ–ã‚’è¡¨ã—ã¦ãŠã‚Šã€
+	  å†…å´ã®ä¸­ã‹ã£ã“ã¯é…åˆ—ã®åˆæœŸåŒ–ã‚’è¡¨ã—ã¦ã„ã¾ã™ã€‚*/
 	Matrix4x4 result = { {
 	   {1, 0, 0, 0},
 	   {0, cos(radian), sin(radian), 0},
@@ -82,13 +82,13 @@ Matrix4x4 Mutiply(const Matrix4x4& m1, const Matrix4x4& m2) {
 Matrix4x4 MakeAffineMatrix(
 	const Vector3& scale, const Vector3& rotate, const Vector3& translate) {
 
-	// •½sˆÚ“®(T)
+	// å¹³è¡Œç§»å‹•(T)
 	Matrix4x4 translateMatrix_ = MakeTranslateMatrix(translate);
 
-	// Šgk(S)
+	// æ‹¡ç¸®(S)
 	Matrix4x4 scaleMatrix_ = MakeScalseMatrix(scale);
 
-	// ‰ñ“](R)
+	// å›è»¢(R)
 	Matrix4x4 roteMatrixX_ = MakeRotateXMatrix(rotate.x);
 	Matrix4x4 roteMatrixY_ = MakeRotateYMatrix(rotate.y);
 	Matrix4x4 roteMatrixZ_ = MakeRotateZMatrix(rotate.z);
@@ -96,7 +96,7 @@ Matrix4x4 MakeAffineMatrix(
 	Matrix4x4 roteMatrixXYZ_ =
 		Mutiply(roteMatrixX_, Mutiply(roteMatrixY_, roteMatrixZ_));
 
-	// s—ñ‚ÌÏ‚ÌŒ‹‡–@‘¥(W = SRT)
+	// è¡Œåˆ—ã®ç©ã®çµåˆæ³•å‰‡(W = SRT)
 	Matrix4x4 affineMatrix_ = Mutiply(scaleMatrix_, roteMatrixXYZ_);
 	affineMatrix_ = Mutiply(affineMatrix_, translateMatrix_);
 
@@ -156,7 +156,7 @@ Matrix4x4 MakeViewportMatrix(
 
 	Matrix4x4 result = { {
 		{scaleX, 0, 0, 0},
-		{0, -scaleY, 0, 0},  // - scaleY‚ÍAƒrƒ…[ƒ|[ƒg‚ÌY²‚ª”½“]‚µ‚Ä‚¢‚é‚½‚ßB
+		{0, -scaleY, 0, 0},  // - scaleYã¯ã€ãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆã®Yè»¸ãŒåè»¢ã—ã¦ã„ã‚‹ãŸã‚ã€‚
 		{0, 0, scaleZ, 0},
 		{offsetX, offsetY, offsetZ, 1}
 	} };
@@ -212,7 +212,7 @@ Matrix4x4 Inverse(const Matrix4x4& m) {
 		m.m[0][2] * (m.m[1][0] * m.m[2][1] - m.m[1][1] * m.m[2][0]);
 
 	if (det == 0) {
-		return invMatrix; // ƒ[ƒœZ‚ÌƒGƒ‰[ˆ—
+		return invMatrix; // ã‚¼ãƒ­é™¤ç®—ã®ã‚¨ãƒ©ãƒ¼å‡¦ç†
 	}
 
 	float invDet = 1.0f / det;
@@ -240,7 +240,7 @@ Matrix4x4 Inverse(const Matrix4x4& m) {
 	return invMatrix;
 }
 
-// À•W•ÏŠ·
+// åº§æ¨™å¤‰æ›
 Vector3 Transform(Vector3 vector, Matrix4x4 matrix) {
 
 	float x = vector.x * matrix.m[0][0] + vector.y * matrix.m[1][0] + vector.z * matrix.m[2][0] + matrix.m[3][0];

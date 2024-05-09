@@ -148,12 +148,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 #endif 
 		
 		// 各種行列の計算
-		Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f, 1.0f,1.0f }, cameraRotate, cameraTranslate);
-		Matrix4x4 cameraMatrix = MakeAffineMatrix({ 1.0f, 1.0f, 1.0f, }, { 0.0f,0.0f,0.0f }, { 0.0f,0.0f,-8.0f });
-		Matrix4x4 viewMatrix = Inverse(cameraMatrix);
 		Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, 1280.0f / 780.0f, 0.1f, 100.0f);
-		Matrix4x4 worldViewProjectionMatix = Mutiply(worldMatrix, Mutiply(viewMatrix, projectionMatrix));
 		Matrix4x4 viewportMatrix = MakeViewportMatrix(0, 0, 1280.0f, 780.0f, 0.0f, 1.0f);
+
+
 
 		///
 		/// ↑更新処理ここまで
@@ -162,6 +160,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 		/// ↓描画処理ここから
 		///
+
+		DrawGrid(projectionMatrix, viewportMatrix);
 
 		///
 		/// ↑描画処理ここまで
