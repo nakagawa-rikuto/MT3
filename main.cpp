@@ -68,7 +68,7 @@ void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, con
 	
 	// 緯度の方向に分割 -π/2 ~ π/2
 	for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex) {
-		float lat = -M_PI / 2.0f + kLatEvery * latIndex; // 現在の緯度
+		float lat = -static_cast<float>(M_PI) / 2.0f + kLatEvery * latIndex; // 現在の緯度
 
 		// 経度の方向に分割 0 ~ 2π
 		for (uint32_t lonIndex = 0; lonIndex < kSubdivision; ++lonIndex) {
@@ -141,8 +141,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::Begin("Window");
 		ImGui::DragFloat3("CameraTranslate", &cameraTranslate.x, 0.01f);
 		ImGui::DragFloat3("CameraRotate", &cameraRotate.x, 0.01f);
-		ImGui::DragFloat3("SphereCenter", &sphere.center.x, 0.01f);
-		ImGui::DragFloat("SphereRadius", &sphere.radius, 0.01f);
+		//ImGui::DragFloat3("SphereCenter", &sphere.center.x, 0.01f);
+		//ImGui::DragFloat("SphereRadius", &sphere.radius, 0.01f);
 		ImGui::End();
 
 #endif 
@@ -150,6 +150,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// 各種行列の計算
 		Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, 1280.0f / 780.0f, 0.1f, 100.0f);
 		Matrix4x4 viewportMatrix = MakeViewportMatrix(0, 0, 1280.0f, 780.0f, 0.0f, 1.0f);
+
+		// カメラ
+		Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f, 1.0f,-1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f });
+		Matrix4x4 cameraMatrix = MakeAffineMatrix({ 1.0f, 1.0f, -1.0f }, cameraRotate, cameraTranslate);
 
 
 
