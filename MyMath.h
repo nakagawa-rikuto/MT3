@@ -1,6 +1,9 @@
 #pragma once
 #include "Matrix4x4.h"
+#include "Vector2.h"
 #include "Vector3.h"
+#include "Vector4.h"
+#define _USE_MATH_DEFINES
 #include <cmath>
 #include <assert.h>
 
@@ -53,3 +56,5 @@ Matrix4x4 Inverse(const Matrix4x4& m);
 // 座標変換
 Vector3 Transform(Vector3 vector, Matrix4x4 matrix);
 
+// Gridを表示する疑似コード
+void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix);
