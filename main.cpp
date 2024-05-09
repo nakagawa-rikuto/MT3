@@ -51,7 +51,7 @@ void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMa
 
 		// スクリーン座標系からビューポート座標系への変換
 		startScreen = Transform(startScreen, viewportMatrix);
-		endScreen = Transform(startScreen, viewportMatrix);
+		endScreen = Transform(endScreen, viewportMatrix);
 
 		//描画
 		Novice::DrawLine(
@@ -63,8 +63,8 @@ void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMa
 void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color) {
 
 	const uint32_t kSubdivision = 16; // 分散数
-	const float kLonEvery = static_cast<float>(M_PI) / kSubdivision; // 経度分割1つの角度
-	const float kLatEvery = static_cast<float>(2 * M_PI) / kSubdivision;// 緯度分割1つの角度
+	const float kLatEvery = static_cast<float>(M_PI) / kSubdivision; // 経度分割1つの角度
+	const float kLonEvery = static_cast<float>(2 * M_PI) / kSubdivision;// 緯度分割1つの角度
 	
 	// 緯度の方向に分割 -π/2 ~ π/2
 	for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex) {
@@ -76,17 +76,17 @@ void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, con
 
 			// world座標系でのa, b, cを求める
 			Vector3 a, b, c;
-			a = { sphere.center.x + std::cos(lon) * std::cos(lat), 
-				  std::sin(lon), 
-				  std::cos(lon) * std::sin(lat) };
+			a = { sphere.radius * std::cos(lon) * std::cos(lat) + sphere.center.x,
+				  sphere.radius * std::sin(lon) + sphere.center.y,
+				  sphere.radius * std::cos(lon) * std::sin(lat) + sphere.center.z};
 
-			b = { std::cos(lon + kLonEvery) * std::cos(lat), 
-				  std::sin(lon + kLonEvery), 
-				  std::cos(lon + kLonEvery) * std::sin(lat) };
+			b = { sphere.radius * std::cos(lon + kLonEvery) * std::cos(lat) + sphere.center.x,
+				  sphere.radius * std::sin(lon + kLonEvery) + sphere.center.y,
+				  sphere.radius * std::cos(lon + kLonEvery) * std::sin(lat) + sphere.center.z};
 
-			c = { std::cos(lon) * std::cos(lat + kLatEvery), 
-				  std::sin(lon), 
-				  std::cos(lon) * std::sin(lat + kLatEvery) };
+			c = { sphere.radius * std::cos(lon) * std::cos(lat + kLatEvery) + sphere.center.x,
+				  sphere.radius * std::sin(lon) + sphere.center.y,
+				  sphere.radius * std::cos(lon) * std::sin(lat + kLatEvery) + sphere.center.z};
 
 			// a,b,cをScreen座標系まで変換
 			
@@ -95,9 +95,9 @@ void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, con
 			Vector3 screenB = Transform(b, viewProjectionMatrix);
 			Vector3 screenC = Transform(c, viewProjectionMatrix);
 
-			screenA = Transform(a, viewportMatrix);
-			screenB = Transform(b, viewportMatrix);
-			screenC = Transform(c, viewportMatrix);
+			screenA = Transform(screenA, viewportMatrix);
+			screenB = Transform(screenB, viewportMatrix);
+			screenC = Transform(screenC, viewportMatrix);
 
 			// ab, bcで線を引く
 			Novice::DrawLine(static_cast<int>(screenA.x), static_cast<int>(screenA.y), static_cast<int>(screenB.x), static_cast<int>(screenB.y), color);
@@ -117,11 +117,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	char preKeys[256] = {0};
 
 	Sphere sphere;
-	sphere.center = { 5.0f, 5.0f, 0.0f };
-	sphere.radius = 10.0f;
+	sphere.center = { 0.0f, 0.0f, 0.0f };
+	sphere.radius = 1.0f;
 
 	Vector3 cameraTranslate = { 0.0f, 1.9f, -6.49f };
 	Vector3 cameraRotate = { 0.26f, 0.0f, 0.0f };
+
+	unsigned int color = RED;
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -141,19 +143,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::Begin("Window");
 		ImGui::DragFloat3("CameraTranslate", &cameraTranslate.x, 0.01f);
 		ImGui::DragFloat3("CameraRotate", &cameraRotate.x, 0.01f);
-		//ImGui::DragFloat3("SphereCenter", &sphere.center.x, 0.01f);
-		//ImGui::DragFloat("SphereRadius", &sphere.radius, 0.01f);
+		ImGui::DragFloat3("SphereCenter", &sphere.center.x, 0.01f);
+		ImGui::DragFloat("SphereRadius", &sphere.radius, 0.01f);
 		ImGui::End();
 
 #endif 
 		
-		// 各種行列の計算
+		// 行列の計算
+		Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f, 1.0f,1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f });
+		Matrix4x4 cameraMatrix = MakeAffineMatrix({ 1.0f, 1.0f, 1.0f }, cameraRotate, cameraTranslate);
+		Matrix4x4 viewMatrix = Inverse(cameraMatrix);
 		Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, 1280.0f / 780.0f, 0.1f, 100.0f);
+		Matrix4x4 wvpMatrix = Mutiply(worldMatrix, Mutiply(viewMatrix, projectionMatrix));
 		Matrix4x4 viewportMatrix = MakeViewportMatrix(0, 0, 1280.0f, 780.0f, 0.0f, 1.0f);
-
-		// カメラ
-		Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f, 1.0f,-1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f });
-		Matrix4x4 cameraMatrix = MakeAffineMatrix({ 1.0f, 1.0f, -1.0f }, cameraRotate, cameraTranslate);
 
 
 
@@ -165,7 +167,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓描画処理ここから
 		///
 
-		DrawGrid(projectionMatrix, viewportMatrix);
+		DrawGrid(wvpMatrix, viewportMatrix);
+		DrawSphere(sphere, wvpMatrix, viewportMatrix, color);
 
 		///
 		/// ↑描画処理ここまで
