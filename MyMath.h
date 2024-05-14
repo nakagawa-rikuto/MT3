@@ -91,3 +91,10 @@ Vector3 Project(const Vector3& v1, const Vector3& v2);
 
 // 最近接点
 Vector3 ClosestPoint(const Vector3& point, const Segment& segment);
+
+// 長さの計算
+float Length(Vector3 v);
+float Length(Vector3 v1, Vector3 v2);
+
+// 円の当たり判定
+bool IsCollision(const Sphere& s1, const Sphere& s2);

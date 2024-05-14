@@ -415,3 +415,39 @@ Vector3 ClosestPoint(const Vector3& point, const Segment& segment) {
 	Vector3 closest = segment.origin + Vector3(v.x * b, v.y * b, v.z * b);
 	return closest;
 }
+
+// 長さの計算
+float Length(Vector3 v) {
+
+	float length = sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
+
+	return length;
+}
+float Length(Vector3 v1, Vector3 v2) {
+
+	float length = v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+
+	return length;
+}
+
+bool IsCollision(const Sphere& s1, const Sphere& s2) {
+	
+	// 中心間の距離の二乗を計算
+	Vector3 distance;
+	distance.x = s1.center.x - s2.center.x;
+	distance.y = s1.center.y - s2.center.y;
+	distance.z = s1.center.z - s2.center.z;
+	float distanceSquared = Length(distance);
+
+	// 半径の合計を計算
+	float radiusSum = s1.radius + s2.radius;
+
+	// 中心間の距離の二乗が半径の合計の二乗以下なら衝突
+	if (distanceSquared <= radiusSum) {
+
+		return true;
+	} else {
+
+		return false;
+	}
+}
