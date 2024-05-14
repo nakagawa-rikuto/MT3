@@ -1,5 +1,8 @@
 #include "MyMath.h"
+#include "Novice.h"
+#include "imgui.h"
 
+// 平行移動
 Matrix4x4 MakeTranslateMatrix(const Vector3& translate) {
 
 	Matrix4x4 translateMatrix = { {
@@ -12,6 +15,7 @@ Matrix4x4 MakeTranslateMatrix(const Vector3& translate) {
 	return translateMatrix;
 }
 
+// 拡縮行列
 Matrix4x4 MakeScalseMatrix(const Vector3& scale) {
 
 	Matrix4x4 scaleMatrix = { {
@@ -24,6 +28,7 @@ Matrix4x4 MakeScalseMatrix(const Vector3& scale) {
 	return scaleMatrix;
 }
 
+// X軸回転行列
 Matrix4x4 MakeRotateXMatrix(float radian) {
 
 	/*外側の中かっこは、Matrix4x4構造体の初期化を表しており、
@@ -38,6 +43,7 @@ Matrix4x4 MakeRotateXMatrix(float radian) {
 	return result;
 }
 
+// Y軸回転行列
 Matrix4x4 MakeRotateYMatrix(float radian) {
 
 	Matrix4x4 result = { {
@@ -50,6 +56,7 @@ Matrix4x4 MakeRotateYMatrix(float radian) {
 	return result;
 }
 
+// Z軸回転行列
 Matrix4x4 MakeRotateZMatrix(float radian) {
 
 	Matrix4x4 result = { {
@@ -62,6 +69,7 @@ Matrix4x4 MakeRotateZMatrix(float radian) {
 	return result;
 }
 
+// 行列同士の掛け算
 Matrix4x4 Mutiply(const Matrix4x4& m1, const Matrix4x4& m2) {
 
 	Matrix4x4 answer = {};
@@ -79,6 +87,7 @@ Matrix4x4 Mutiply(const Matrix4x4& m1, const Matrix4x4& m2) {
 	return answer;
 }
 
+// 3次元アフィン変換行列
 Matrix4x4 MakeAffineMatrix(
 	const Vector3& scale, const Vector3& rotate, const Vector3& translate) {
 
@@ -103,6 +112,7 @@ Matrix4x4 MakeAffineMatrix(
 	return affineMatrix_;
 }
 
+// クロス積
 Vector3 Cross(const Vector3& v1, const Vector3& v2) {
 
 	float x = v1.y * v2.z - v1.z * v2.y;
@@ -112,6 +122,7 @@ Vector3 Cross(const Vector3& v1, const Vector3& v2) {
 	return Vector3(x, y, z);
 }
 
+// 単位行列の作成
 Matrix4x4 MakeIdenitiy4x4() {
 
 	Matrix4x4 answer;
@@ -130,6 +141,7 @@ Matrix4x4 MakeIdenitiy4x4() {
 	return answer;
 }
 
+// 転置行列
 Matrix4x4 TransposeMatrix(const Matrix4x4& m) {
 
 	Matrix4x4 answer;
@@ -144,6 +156,7 @@ Matrix4x4 TransposeMatrix(const Matrix4x4& m) {
 	return answer;
 }
 
+// ビューポート変換行列
 Matrix4x4 MakeViewportMatrix(
 	float left, float top, float width, float height, float minDepth, float maxDepth) {
 
@@ -164,6 +177,7 @@ Matrix4x4 MakeViewportMatrix(
 	return result;
 }
 
+// 透視影行列
 Matrix4x4 MakePerspectiveFovMatrix(
 	float fovY, float aspectRatio, float nearClip, float farClip) {
 
@@ -182,6 +196,7 @@ Matrix4x4 MakePerspectiveFovMatrix(
 	return result;
 }
 
+// 正射影行列
 Matrix4x4 MakeOrethographicMatrx(
 	float left, float top, float right, float bottom, float nearClip, float farClip) {
 
@@ -202,6 +217,7 @@ Matrix4x4 MakeOrethographicMatrx(
 	return result;
 }
 
+// 逆行列
 Matrix4x4 Inverse(const Matrix4x4& m) {
 
 	Matrix4x4 invMatrix;
@@ -256,3 +272,146 @@ Vector3 Transform(Vector3 vector, Matrix4x4 matrix) {
 	return Vector3(x, y, z);
 }
 
+// グリッドの描画
+void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix) {
+	const float kGridHalfWidth = 2.0f;                                      // Gridの半分の幅
+	const uint32_t kSubdivision = 10;                                       // 分散数
+	const float kGridEvery = (kGridHalfWidth * 2.0f) / float(kSubdivision); // 1つ分の長さ
+
+	// 奥から手前への線を順序に引いていく
+	for (uint32_t xIndex = 0; xIndex <= kSubdivision; ++xIndex) {
+
+		// ワールド座標系上の始点を計算する
+		Vector3 start(-kGridHalfWidth + xIndex * kGridEvery, 0.0f, -kGridHalfWidth);
+
+		// ワールド座標系上の終点を計算する
+		Vector3 end(-kGridHalfWidth + xIndex * kGridEvery, 0.0f, kGridHalfWidth);
+
+		// ワールド座標系からスクリーン座標系への変換
+		Vector3 startScreen = Transform(start, viewProjectionMatrix);
+		Vector3 endScreen = Transform(end, viewProjectionMatrix);
+
+		// スクリーン座標系からビューポート座標系への変換
+		startScreen = Transform(startScreen, viewportMatrix);
+		endScreen = Transform(endScreen, viewportMatrix);
+
+		// 変換した座標を使って表示。色は薄い灰色(0xAAAAAAFF)
+		Novice::DrawLine(
+			static_cast<int>(startScreen.x), static_cast<int>(startScreen.y),
+			static_cast<int>(endScreen.x), static_cast<int>(endScreen.y), 0xAAAAAAFF);
+	}
+
+	// 左から右も同じように順々に引いていく
+	for (uint32_t zIndex = 0; zIndex <= kSubdivision; ++zIndex) {
+		// 奥から手前が左右に変わるだけ
+
+		 // ワールド座標系上の始点を計算する
+		Vector3 start(-kGridHalfWidth, 0.0f, -kGridHalfWidth + zIndex * kGridEvery);
+		// ワールド座標系上の終点を計算する
+		Vector3 end(kGridHalfWidth, 0.0f, -kGridHalfWidth + zIndex * kGridEvery);
+
+		// ワールド座標系からスクリーン座標系への変換
+		Vector3 startScreen = Transform(start, viewProjectionMatrix);
+		Vector3 endScreen = Transform(end, viewProjectionMatrix);
+
+		// スクリーン座標系からビューポート座標系への変換
+		startScreen = Transform(startScreen, viewportMatrix);
+		endScreen = Transform(endScreen, viewportMatrix);
+
+		//描画
+		Novice::DrawLine(
+			static_cast<int>(startScreen.x), static_cast<int>(startScreen.y),
+			static_cast<int>(endScreen.x), static_cast<int>(endScreen.y), 0xAAAAAAFF);
+	}
+}
+
+// スフィアの描画
+void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color) {
+
+	const uint32_t kSubdivision = 16; // 分散数
+	const float kLatEvery = static_cast<float>(M_PI) / kSubdivision; // 経度分割1つの角度
+	const float kLonEvery = static_cast<float>(2 * M_PI) / kSubdivision;// 緯度分割1つの角度
+
+	// 緯度の方向に分割 -π/2 ~ π/2
+	for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex) {
+		float lat = -static_cast<float>(M_PI) / 2.0f + kLatEvery * latIndex; // 現在の緯度
+
+		// 経度の方向に分割 0 ~ 2π
+		for (uint32_t lonIndex = 0; lonIndex < kSubdivision; ++lonIndex) {
+			float lon = lonIndex * kLonEvery; // 現在の経度
+
+			// world座標系でのa, b, cを求める
+			Vector3 a, b, c;
+			a = { sphere.radius * std::cos(lon) * std::cos(lat) + sphere.center.x,
+				  sphere.radius * std::sin(lon) + sphere.center.y,
+				  sphere.radius * std::cos(lon) * std::sin(lat) + sphere.center.z };
+
+			b = { sphere.radius * std::cos(lon + kLonEvery) * std::cos(lat) + sphere.center.x,
+				  sphere.radius * std::sin(lon + kLonEvery) + sphere.center.y,
+				  sphere.radius * std::cos(lon + kLonEvery) * std::sin(lat) + sphere.center.z };
+
+			c = { sphere.radius * std::cos(lon) * std::cos(lat + kLatEvery) + sphere.center.x,
+				  sphere.radius * std::sin(lon) + sphere.center.y,
+				  sphere.radius * std::cos(lon) * std::sin(lat + kLatEvery) + sphere.center.z };
+
+			// a,b,cをScreen座標系まで変換
+
+
+			Vector3 screenA = Transform(a, viewProjectionMatrix);
+			Vector3 screenB = Transform(b, viewProjectionMatrix);
+			Vector3 screenC = Transform(c, viewProjectionMatrix);
+
+			screenA = Transform(screenA, viewportMatrix);
+			screenB = Transform(screenB, viewportMatrix);
+			screenC = Transform(screenC, viewportMatrix);
+
+			// ab, bcで線を引く
+			Novice::DrawLine(static_cast<int>(screenA.x), static_cast<int>(screenA.y), static_cast<int>(screenB.x), static_cast<int>(screenB.y), color);
+			Novice::DrawLine(static_cast<int>(screenA.x), static_cast<int>(screenA.y), static_cast<int>(screenC.x), static_cast<int>(screenC.y), color);
+		}
+	}
+}
+
+// 正射影ベクトル
+Vector3 Project(const Vector3& v1, const Vector3& v2) {
+
+	// ベクトルv2の単位ベクトルを計算する
+	float lengthSquared =
+		sqrt(v2.x * v2.x + v2.y * v2.y + v2.z * v2.z) * sqrt(v2.x * v2.x + v2.y * v2.y + v2.z * v2.z);
+
+	Vector3 unitV2 =
+	{ v2.x * (1.0f / lengthSquared), v2.y * (1.0f / lengthSquared), v2.z * (1.0f / lengthSquared) };
+
+	// v1をv2に対して正射影する
+	float projectLength = 
+	{ v1.x * unitV2.x + v1.y * unitV2.y + v1.z * unitV2.z };
+
+	return Vector3(unitV2.x * projectLength, unitV2.y * projectLength, unitV2.z * projectLength);
+}
+
+// 最近接点
+Vector3 ClosestPoint(const Vector3& point, const Segment& segment) {
+
+	// 線分の方向ベクトル
+	Vector3 v = segment.diff;
+
+	// 始点からの点へのベクトル
+	Vector3 w = point - segment.origin;
+
+	// 線分の始点よりも前にある場合、始点が最近接点
+	float c1 = w.x * v.x + w.y * v.y + w.z * v.z;
+	if (c1 <= 0) {
+		return segment.origin;
+	}
+		
+	float c2 = v.x * v.x + v.y * v.y + v.z * v.z;
+	// 線分の終点よりも後ろにある場合、終点が最近接点
+	if (c2 <= c1) {
+		return segment.origin + v;
+	}
+		
+	// 線分上にある場合、垂線の足を求める
+	float b = c1 / c2;
+	Vector3 closest = segment.origin + Vector3(v.x * b, v.y * b, v.z * b);
+	return closest;
+}
