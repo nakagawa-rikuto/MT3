@@ -16,18 +16,24 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Segment segment = { {-2.0f, -1.0f, 0.0f}, {3.0f, 2.0f, 2.0f} };
 	Vector3 point = { -1.5f, 0.6f, 0.6f };
 
-	Vector3 project = Project();
+	Vector3 project = Project({point - segment.origin}, segment.diff);
+	Vector3 closesPoint = ClosestPoint(point, segment);
 
-	Sphere sphere;
+	Sphere pointSphere = { point, 0.01f }; // 1cmの球を描画
+	Sphere closestPointSpere = { closesPoint, 0.01f };
+
+	// 01_02の変数
+	/*Sphere sphere;
 	sphere.center = { 0.0f, 0.0f, 0.0f };
 	sphere.radius = 1.0f;
+	unsigned int color = RED;*/
 
 	Vector3 cameraTranslate = { 0.0f, 1.9f, -6.49f };
 	Vector3 cameraRotate = { 0.26f, 0.0f, 0.0f };
 
+	
 
-
-	unsigned int color = RED;
+	
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -47,8 +53,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::Begin("Window");
 		ImGui::DragFloat3("CameraTranslate", &cameraTranslate.x, 0.01f);
 		ImGui::DragFloat3("CameraRotate", &cameraRotate.x, 0.01f);
-		ImGui::DragFloat3("SphereCenter", &sphere.center.x, 0.01f);
-		ImGui::DragFloat("SphereRadius", &sphere.radius, 0.01f);
+		//ImGui::DragFloat3("SphereCenter", &sphere.center.x, 0.01f);
+		//ImGui::DragFloat("SphereRadius", &sphere.radius, 0.01f);
+		ImGui::InputFloat3("Project", &project.x, "%.3f", ImGuiInputTextFlags_ReadOnly);
 		ImGui::End();
 
 #endif 
@@ -61,7 +68,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Matrix4x4 wvpMatrix = Mutiply(worldMatrix, Mutiply(viewMatrix, projectionMatrix));
 		Matrix4x4 viewportMatrix = MakeViewportMatrix(0, 0, 1280.0f, 780.0f, 0.0f, 1.0f);
 
-
+		Vector3 start = Transform(Transform(segment.origin, wvpMatrix), viewportMatrix);
+		Vector3 end = Transform(Transform(segment.origin + segment.diff, wvpMatrix), viewportMatrix);
 
 		///
 		/// ↑更新処理ここまで
@@ -71,8 +79,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓描画処理ここから
 		///
 
+		DrawSphere(pointSphere, wvpMatrix, viewportMatrix, RED);
+		DrawSphere(closestPointSpere, wvpMatrix, viewportMatrix, BLACK);
+
+		Novice::DrawLine(static_cast<int>(start.x), static_cast<int>(start.y), static_cast<int>(end.x), static_cast<int>(end.y), WHITE);
+
 		DrawGrid(wvpMatrix, viewportMatrix);
-		DrawSphere(sphere, wvpMatrix, viewportMatrix, color);
+		//DrawSphere(sphere, wvpMatrix, viewportMatrix, color);
 
 		///
 		/// ↑描画処理ここまで
