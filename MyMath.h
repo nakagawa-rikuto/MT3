@@ -31,6 +31,13 @@ struct Segment {
 	Vector3 diff;   // !< 終点への差分ベクトル
 };
 
+// 平面
+struct Plane {
+	Vector3 normal; // !< 法線
+	float distance; // !< 距離
+};
+
+#pragma region /// 座標変換 ///
 // 平行移動
 Matrix4x4 MakeTranslateMatrix(const Vector3& translate);
 
@@ -47,7 +54,7 @@ Matrix4x4 MakeRotateYMatrix(float radian);
 Matrix4x4 MakeRotateZMatrix(float radian);
 
 // 行列同士の掛け算
-Matrix4x4 Mutiply(const Matrix4x4& m1, const Matrix4x4& m2);
+Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2);
 
 // 3次元アフィン変換行列
 Matrix4x4 MakeAffineMatrix(
@@ -80,11 +87,7 @@ Matrix4x4 Inverse(const Matrix4x4& m);
 // 座標変換
 Vector3 Transform(Vector3 vector, Matrix4x4 matrix);
 
-// Gridを表示する疑似コード
-void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix);
-
-// スフィアの描画
-void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
+#pragma endregion
 
 // 正射影ベクトル
 Vector3 Project(const Vector3& v1, const Vector3& v2);
@@ -92,9 +95,19 @@ Vector3 Project(const Vector3& v1, const Vector3& v2);
 // 最近接点
 Vector3 ClosestPoint(const Vector3& point, const Segment& segment);
 
-// 長さの計算
-float Length(Vector3 v);
-float Length(Vector3 v1, Vector3 v2);
+#pragma region /// 計算 ///
 
-// 円の当たり判定
-bool IsCollision(const Sphere& s1, const Sphere& s2);
+// 内積の計算
+float Dot(const Vector3& v1, const Vector3& v2);
+
+// 長さの計算
+float Length(const Vector3& v);
+float Length(const Vector3& v1, const Vector3& v2);
+
+// 正規化
+Vector3 Normalize(const Vector3& v);
+
+#pragma endregion
+
+// 垂直なベクトルをl求める関数
+Vector3 Perpendicular(const Vector3& vector);
