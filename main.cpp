@@ -18,15 +18,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Segment segment = { {-2.0f, -1.0f, 0.0f}, {3.0f, 2.0f, 2.0f} };
 	Vector3 point = { -1.5f, 0.6f, 0.6f };
 
-	/*Vector3 project = Project({point - segment.origin}, segment.diff);
-	Vector3 closesPoint = ClosestPoint(point, segment);*/
+	Vector3 project = Project({point - segment.origin}, segment.diff);
+	Vector3 closesPoint = ClosestPoint(point, segment);
 
 	//Sphere pointSphere = { point, 0.01f }; // 1cmの球を描画
 	//Sphere closestPointSpere = { closesPoint, 0.01f };
 
-	Sphere sphere1;
+	/*Sphere sphere1;
 	sphere1.center = { -1.0f, 0.0f, 0.0f };
-	sphere1.radius = 1.0f;
+	sphere1.radius = 1.0f;*/
 	unsigned int color = WHITE;
 
 	/*Sphere sphere2;
@@ -54,21 +54,25 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓更新処理ここから
 		///
 
+		/* ///////////////////////////////
+		            ImGui
+		*/ ///////////////////////////////
 #ifdef  _DEBUG
 
 		ImGui::Begin("Window");
 		ImGui::DragFloat3("CameraTranslate", &cameraTranslate.x, 0.01f);
 		ImGui::DragFloat3("CameraRotate", &cameraRotate.x, 0.01f);
-		ImGui::DragFloat3("SphereCenter", &sphere1.center.x, 0.01f);
-		ImGui::DragFloat("SphereRadius", &sphere1.radius, 0.01f);
+		//ImGui::DragFloat3("SphereCenter", &sphere1.center.x, 0.01f);
+		//ImGui::DragFloat("SphereRadius", &sphere1.radius, 0.01f);
 		ImGui::DragFloat3("Plane.Normal", &plane.normal.x, 0.01f);
 		ImGui::DragFloat("Plane.Distance", &plane.distance, 0.01f);
-		//ImGui::InputFloat3("Project", &project.x, "%.3f", ImGuiInputTextFlags_ReadOnly);
+
+		ImGui::InputFloat3("Project", &project.x, "%.3f", ImGuiInputTextFlags_ReadOnly);
 		ImGui::End();
 
 #endif 
 
-		if (IsCollision(sphere1, plane)) {
+		if (IsCollision(segment, plane)) {
 
 			color = RED;
 		} else {
@@ -84,8 +88,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Matrix4x4 wvpMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 		Matrix4x4 viewportMatrix = MakeViewportMatrix(0, 0, 1280.0f, 780.0f, 0.0f, 1.0f);
 
-		//Vector3 start = Transform(Transform(segment.origin, wvpMatrix), viewportMatrix);
-		//Vector3 end = Transform(Transform(segment.origin + segment.diff, wvpMatrix), viewportMatrix);
+		// 線のスタートとエンド
+		Vector3 start = Transform(Transform(segment.origin, wvpMatrix), viewportMatrix);
+		Vector3 end = Transform(Transform(segment.origin + segment.diff, wvpMatrix), viewportMatrix);
 
 		///
 		/// ↑更新処理ここまで
@@ -97,10 +102,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		//DrawSphere(pointSphere, wvpMatrix, viewportMatrix, RED);
 		//DrawSphere(closestPointSpere, wvpMatrix, viewportMatrix, BLACK);
-		//Novice::DrawLine(static_cast<int>(start.x), static_cast<int>(start.y), static_cast<int>(end.x), static_cast<int>(end.y), WHITE);
+		Novice::DrawLine(static_cast<int>(start.x), static_cast<int>(start.y), static_cast<int>(end.x), static_cast<int>(end.y), color);
 
 		DrawGrid(wvpMatrix, viewportMatrix);
-		DrawSphere(sphere1, wvpMatrix, viewportMatrix, color);
+		//DrawSphere(sphere1, wvpMatrix, viewportMatrix, color);
 		DrawPlane(plane, wvpMatrix, viewportMatrix, WHITE);
 		//DrawSphere(sphere2, wvpMatrix, viewportMatrix, WHITE);
 

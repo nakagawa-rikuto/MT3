@@ -41,3 +41,26 @@ bool IsCollision(const Sphere& sphere, const Plane& plane) {
 		return false;
 	}
 }
+
+// 線と平面の当たり判定
+bool IsCollision(const Segment& segment, const Plane& plane) {
+
+	// 線分の終点を求める
+	Vector3 endPoint = 
+	{ segment.origin.x + segment.diff.x,segment.origin.y + segment.diff.y, segment.origin.z + segment.diff.z };
+
+	// 始点と終点の平面からの距離を計算
+	float distanceOrigin = Dot(plane.normal, segment.origin) + plane.distance;
+	float distanceEndPoint = Dot(plane.normal, endPoint) + plane.distance;
+
+	// 異なる側にあるかどうかを判別
+	// 異なる側にある場合,一方が正、一方が負になる
+	if (distanceOrigin * distanceEndPoint <= 0) {
+
+		return true;
+	} else {
+
+		return false;
+	}
+
+}
