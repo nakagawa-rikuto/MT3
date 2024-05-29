@@ -139,3 +139,20 @@ void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const 
 	Novice::DrawLine(
 		static_cast<int>(points[3].x), static_cast<int>(points[3].y), static_cast<int>(points[0].x), static_cast<int>(points[0].y), color);
 }
+
+// 三角形の描画
+void DrawTriangle(const Triangle& triangle, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color) {
+
+	Vector3 Screen[3];
+
+	for (int i = 0; i < 3; i++) {
+
+		Screen[i] = Transform(Transform(triangle.vertices[i], viewProjectionMatrix), viewportMatrix);
+	}
+
+	Novice::DrawTriangle(
+		static_cast<int>(Screen[0].x), static_cast<int>(Screen[0].y),
+		static_cast<int>(Screen[1].x), static_cast<int>(Screen[1].y),
+		static_cast<int>(Screen[2].x), static_cast<int>(Screen[2].y),
+		color, kFillModeWireFrame);
+}

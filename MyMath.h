@@ -13,6 +13,11 @@ struct Sphere {
 	float radius;    // 半径
 };
 
+// 三角形の情報
+struct Triangle {
+	Vector3 vertices[3];
+};
+
 // 直線
 struct Line {
 	Vector3 origin; // !< 始点

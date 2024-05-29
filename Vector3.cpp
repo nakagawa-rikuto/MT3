@@ -1,6 +1,6 @@
 #include "Vector3.h"
 
-Vector3 Vector3::operator+=(Vector3& obj) {
+Vector3 Vector3::operator+=(const Vector3& obj) {
 
 	this->x += obj.x;
 	this->y += obj.y;

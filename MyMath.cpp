@@ -112,16 +112,6 @@ Matrix4x4 MakeAffineMatrix(
 	return affineMatrix_;
 }
 
-// クロス積
-Vector3 Cross(const Vector3& v1, const Vector3& v2) {
-
-	float x = v1.y * v2.z - v1.z * v2.y;
-	float y = v1.z * v2.x - v1.x * v2.z;
-	float z = v1.x * v2.y - v1.y * v2.x;
-
-	return Vector3(x, y, z);
-}
-
 // 単位行列の作成
 Matrix4x4 MakeIdenitiy4x4() {
 
@@ -335,6 +325,16 @@ float Length(const Vector3& v1, const Vector3& v2) {
 	float length = sqrtf(v1.x * v2.x + v1.y * v2.y + v1.z * v2.z);
 
 	return length;
+}
+
+// クロス積
+Vector3 Cross(const Vector3& v1, const Vector3& v2) {
+
+	float x = v1.y * v2.z - v1.z * v2.y;
+	float y = v1.z * v2.x - v1.x * v2.z;
+	float z = v1.x * v2.y - v1.y * v2.x;
+
+	return Vector3(x, y, z);
 }
 
 // 正規化

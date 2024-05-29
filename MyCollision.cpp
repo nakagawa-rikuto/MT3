@@ -64,3 +64,61 @@ bool IsCollision(const Segment& segment, const Plane& plane) {
 	}
 
 }
+
+// 線と三角形の当たり判定
+bool IsCollision(const Segment& segment, const Triangle& triangle) {
+	
+	// 浮動小数点の誤差を避けるための小さな値
+	const float EPSILON = 1e-8f;
+
+	// 三角形の頂点
+	Vector3 vertex0 = triangle.vertices[0];
+	Vector3 vertex1 = triangle.vertices[1];
+	Vector3 vertex2 = triangle.vertices[2];
+
+	// 三角形のエッジベクトル
+	Vector3 edge1 = vertex1 - vertex0;
+	Vector3 edge2 = vertex2 - vertex0;
+
+	// 線分の差分ベクトルとエッジベクトルのクロス積
+	Vector3 h = Cross(segment.diff, edge2);
+	float a = Dot(edge1, h);
+
+	// 線分が三角形と平行であるかをチェック
+	if (a > -EPSILON && a < EPSILON) {
+		return false; // 線分は三角形と平行
+	}
+
+	// aの逆数を計算
+	float f = 1.0f / a;
+	Vector3 s = segment.origin - vertex0;
+	float u = f * Dot(s, h);
+
+	// uが0から1の範囲にあるかをチェック（範囲外なら交差しない）
+	if (u < 0.0f || u > 1.0f) {
+		return false; // 三角形の外
+	}
+
+	// sとedge1のクロス積
+	Vector3 q = Cross(s, edge1);
+	float v = f * Dot(segment.diff, q);
+
+	// vが0から1の範囲にあるか、およびu+vが1以下かをチェック（範囲外なら交差しない）
+	if (v < 0.0f || u + v > 1.0f) {
+		return false; // 三角形の外
+	}
+
+	// 線分の始点から交差点までの距離tを計算
+	float t = f * Dot(edge2, q);
+
+	// tがEPSILON以上かつ1+EPSILON以下であることをチェック（線分の範囲内かどうか）
+	if (t > EPSILON && t < 1.0f + EPSILON) { 
+
+		// 線分が三角形と交差する
+		return true;
+	} else {
+
+		// 線分が三角形と交差しない
+		return false;
+	}
+}
