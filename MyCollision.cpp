@@ -123,6 +123,7 @@ bool IsCollision(const Segment& segment, const Triangle& triangle) {
 	}
 }
 
+// AABB同士の当たり判定
 bool IsCollision(const AABB& aabb1, const AABB& aabb2) {
 
 	// x軸方向の判定
@@ -142,4 +143,23 @@ bool IsCollision(const AABB& aabb1, const AABB& aabb2) {
 
 	// 全ての軸で重なっている場合は衝突とみなす
 	return true;
+}
+
+// AABBと球の当たり判定
+bool IsCollision(const AABB& aabb, const Sphere& sphere) {
+	
+	// AABB における球の中心の最近接点を求める
+	Vector3 closest = ClosestPoint(sphere.center, aabb);
+
+	// 球の中心から最近接点までの距離の平方を計算する
+	float distanceSquared = Length(closest - sphere.center);
+
+	// 距離が球の半径の二乗よりも小さいかどうかをチェックする
+	if (distanceSquared <= sphere.radius) {
+
+		return true;
+	} else {
+
+		return false;
+	}
 }

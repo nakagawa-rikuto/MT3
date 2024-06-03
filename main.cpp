@@ -20,9 +20,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		.max{0.0f, 0.0f, 0.0f}
 	};
 
-	AABB aabb2{
-		.min{0.2f, 0.2f, 0.2f},
-		.max{1.0f, 1.0f, 1.0f}
+	Sphere sphere{
+		.center{-1.0f, 0.0f, 0.0f},
+		.radius = 1.0f
 	};
 
 	unsigned int color = WHITE;
@@ -54,11 +54,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::DragFloat3("CameraRotate", &cameraRotate.x, 0.01f);
 		ImGui::End();
 
-		ImGui::Begin("AABB");
+		ImGui::Begin("Data");
 		ImGui::DragFloat3("AABB1.min", &aabb1.min.x, 0.01f);
 		ImGui::DragFloat3("AABB1.max", &aabb1.max.x, 0.01f);
-		ImGui::DragFloat3("AABB2.min", &aabb2.min.x, 0.01f);
-		ImGui::DragFloat3("AABB2.max", &aabb2.max.x, 0.01f);
+		ImGui::DragFloat3("Sphere.center", &sphere.center.x, 0.01f);
+		ImGui::DragFloat("Sphere.radius", &sphere.radius, 0.01f);
 		ImGui::End();
 
 #endif 
@@ -70,14 +70,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		aabb1.min.z = (std::min)(aabb1.min.z, aabb1.max.z);
 		aabb1.max.z = (std::max)(aabb1.min.z, aabb1.max.z);
 
-		aabb2.min.x = (std::min)(aabb2.min.x, aabb2.max.x);
-		aabb2.max.x = (std::max)(aabb2.min.x, aabb2.max.x);
-		aabb2.min.y = (std::min)(aabb2.min.y, aabb2.max.y);
-		aabb2.max.y = (std::max)(aabb2.min.y, aabb2.max.y);
-		aabb2.min.z = (std::min)(aabb2.min.z, aabb2.max.z);
-		aabb2.max.z = (std::max)(aabb2.min.z, aabb2.max.z);
-
-		if (IsCollision(aabb1, aabb2)) {
+		if (IsCollision(aabb1, sphere)) {
 
 			color = RED;
 		} else {
@@ -103,7 +96,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		DrawGrid(wvpMatrix, viewportMatrix);
 		DrawAABB(aabb1,wvpMatrix, viewportMatrix, color);
-		DrawAABB(aabb2, wvpMatrix, viewportMatrix, WHITE);
+		DrawSphere(sphere, wvpMatrix, viewportMatrix, WHITE);
 
 		///
 		/// ↑描画処理ここまで

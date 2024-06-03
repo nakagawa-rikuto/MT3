@@ -8,6 +8,7 @@
 #include <assert.h>
 #include <array>
 #include <cstdint>
+#include <algorithm>
 
 // スフィアの情報
 struct Sphere {
@@ -105,8 +106,11 @@ Vector3 Transform(Vector3 vector, Matrix4x4 matrix);
 // 正射影ベクトル
 Vector3 Project(const Vector3& v1, const Vector3& v2);
 
-// 最近接点
+// 最近接点(線)
 Vector3 ClosestPoint(const Vector3& point, const Segment& segment);
+
+// 最近接点(AABB)
+Vector3 ClosestPoint(const Vector3& point, const AABB& aabb);
 
 #pragma region /// 計算 ///
 

@@ -306,6 +306,15 @@ Vector3 ClosestPoint(const Vector3& point, const Segment& segment) {
 	return closest;
 }
 
+Vector3 ClosestPoint(const Vector3& point, const AABB& aabb) {
+
+	Vector3 closest;
+	closest.x = (point.x < aabb.min.x) ? aabb.min.x : ((point.x > aabb.max.x) ? aabb.max.x : point.x);
+	closest.y = (point.y < aabb.min.y) ? aabb.min.y : ((point.y > aabb.max.y) ? aabb.max.y : point.y);
+	closest.z = (point.z < aabb.min.z) ? aabb.min.z : ((point.z > aabb.max.z) ? aabb.max.z : point.z);
+	return closest;
+}
+
 // 内積の計算
 float Dot(const Vector3& v1, const Vector3& v2) {
 
