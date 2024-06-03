@@ -13,3 +13,6 @@ void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const 
 // 三角形の描画
 void DrawTriangle(const Triangle& triangle, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
 
+// AABBの描画
+void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
+

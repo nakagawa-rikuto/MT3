@@ -6,11 +6,19 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include <assert.h>
+#include <array>
+#include <cstdint>
 
 // スフィアの情報
 struct Sphere {
 	Vector3 center;  // 中心
 	float radius;    // 半径
+};
+
+// AABB
+struct AABB {
+	Vector3 min; //!<最小点
+	Vector3 max; //!<最大点
 };
 
 // 三角形の情報

@@ -156,3 +156,38 @@ void DrawTriangle(const Triangle& triangle, const Matrix4x4& viewProjectionMatri
 		static_cast<int>(Screen[2].x), static_cast<int>(Screen[2].y),
 		color, kFillModeWireFrame);
 }
+
+void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color) {
+
+	// AABBの8つの頂点を定義
+	std::array<Vector3, 8> vertices = {
+		Vector3(aabb.min.x, aabb.min.y, aabb.min.z),
+		Vector3(aabb.max.x, aabb.min.y, aabb.min.z),
+		Vector3(aabb.max.x, aabb.max.y, aabb.min.z),
+		Vector3(aabb.min.x, aabb.max.y, aabb.min.z),
+		Vector3(aabb.min.x, aabb.min.y, aabb.max.z),
+		Vector3(aabb.max.x, aabb.min.y, aabb.max.z),
+		Vector3(aabb.max.x, aabb.max.y, aabb.max.z),
+		Vector3(aabb.min.x, aabb.max.y, aabb.max.z)
+	};
+
+	// 変換行列を適用して画面空間に変換
+	for (auto& vertex : vertices) {
+		vertex = Transform(vertex, viewProjectionMatrix);
+		vertex = Transform(vertex, viewportMatrix);
+	}
+
+	// AABBの12本のエッジを描画
+	std::array<std::pair<int, int>, 12> edges = { {
+		{0, 1}, {1, 2}, {2, 3}, {3, 0}, // 底面
+		{4, 5}, {5, 6}, {6, 7}, {7, 4}, // 上面
+		{0, 4}, {1, 5}, {2, 6}, {3, 7}  // 側面
+	} };
+
+	for (const auto& edge : edges) {
+		const Vector3& start = vertices[edge.first];
+		const Vector3& end = vertices[edge.second];
+		Novice::DrawLine(static_cast<int>(std::round(start.x)), static_cast<int>(std::round(start.y)),
+			static_cast<int>(std::round(end.x)), static_cast<int>(std::round(end.y)), color);
+	}
+}
