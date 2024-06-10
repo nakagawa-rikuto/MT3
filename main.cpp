@@ -72,17 +72,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 #endif 
 
-		Vector3 centerInOBBLocalSpace =
-			Transform(sphere.center, Inverse(CreateOBBWorldMatrix(obb)));
-
-		AABB aabbOBBLocal { 
-			.min = {-obb.size.x, -obb.size.y, -obb.size.z},
-			.max = obb.size };
-
-		Sphere sphereOBBLocal{ centerInOBBLocalSpace, sphere.radius };
+		
 
 		// ローカル空間で衝突判定
-		if (IsCollision(aabbOBBLocal, sphereOBBLocal)) {
+		if (IsCollision(obb, sphere)) {
 
 			color = RED;
 		} else {
