@@ -211,11 +211,23 @@ bool IsCollision(const OBB& obb, const Sphere& sphere) {
 
 	Sphere sphereOBBLocal{ centerInOBBLocalSpace, sphere.radius };
 
-	if (IsCollision(aabbOBBLocal, sphereOBBLocal)) {
+	return IsCollision(aabbOBBLocal, sphereOBBLocal);
+}
 
-		return true;
-	} else {
+bool IsCollision(const Segment& segment, const OBB& obb) {
+	
+	Vector3 localOrigin = Transform(segment.origin, Inverse(CreateOBBWorldMatrix(obb)));
+	Vector3 localEnd = Transform(segment.origin + segment.diff, Inverse(CreateOBBWorldMatrix(obb)));
 
-		return false;
-	}
+	AABB localAABB{
+		.min = {-obb.size.x, -obb.size.y, -obb.size.z},
+		.max = obb.size
+	};
+
+	Segment localSegment{
+		.origin = localOrigin,
+		.diff = localEnd - localOrigin
+	};
+
+	return IsCollision(localAABB, localSegment);
 }

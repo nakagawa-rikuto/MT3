@@ -26,9 +26,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		.size = {0.5f, 0.5f, 0.5f}
 	};
 
-	Sphere sphere{
-		.center = {0.0f, 0.0f, 0.0f},
-		.radius = 0.5f
+	Segment segment{
+		.origin = {-0.7f, 0.3f, 0.0f},
+		.diff = {2.0f, -0.5f, 0.0f}
 	};
 
 	unsigned int color = WHITE;
@@ -66,8 +66,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		ImGui::DragFloat3("rotate", &rotate.x, 0.01f);
 
-		ImGui::DragFloat3("Sphere.center", &sphere.center.x, 0.01f);
-		ImGui::DragFloat("Sphere.radius", &sphere.radius, 0.01f);
+		ImGui::DragFloat3("Segment.orign", &segment.origin.x, 0.01f);
+		ImGui::DragFloat3("Segment.diff", &segment.diff.x, 0.01f);
 		ImGui::End();
 
 #endif 
@@ -75,7 +75,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		
 
 		// ローカル空間で衝突判定
-		if (IsCollision(obb, sphere)) {
+		if (IsCollision(segment, obb)) {
 
 			color = RED;
 		} else {
@@ -91,6 +91,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Matrix4x4 wvpMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 		Matrix4x4 viewportMatrix = MakeViewportMatrix(0, 0, 1280.0f, 780.0f, 0.0f, 1.0f);
 
+
+		/* //////////////////////////////
+		            OBBの回転
+		*/ //////////////////////////////
 		// 回転行列を生成
 		Matrix4x4 rotateMatrix = Multiply(MakeRotateXMatrix(rotate.x), Multiply(MakeRotateYMatrix(rotate.y), MakeRotateZMatrix(rotate.z)));
 
@@ -107,6 +111,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		obb.orientations[2].y = rotateMatrix.m[2][1];
 		obb.orientations[2].z = rotateMatrix.m[2][2];
 
+		// 線のスタートとエンド
+		Vector3 start = Transform(Transform(segment.origin, wvpMatrix), viewportMatrix);
+		Vector3 end = Transform(Transform(segment.origin + segment.diff, wvpMatrix), viewportMatrix);
+
 		///
 		/// ↑更新処理ここまで
 		///
@@ -117,10 +125,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		DrawGrid(wvpMatrix, viewportMatrix);
 		DrawOBB(obb, wvpMatrix, viewportMatrix, color);
-		DrawSphere(sphere, wvpMatrix, viewportMatrix, WHITE);
-		//DrawAABB(aabbOBBLocal, wvpMatrix, viewportMatrix, color);
-
-
+		Novice::DrawLine(static_cast<int>(start.x), static_cast<int>(start.y), static_cast<int>(end.x), static_cast<int>(end.y), BLACK);
+		
 		///
 		/// ↑描画処理ここまで
 		///
