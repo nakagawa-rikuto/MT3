@@ -262,6 +262,37 @@ Vector3 Transform(Vector3 vector, Matrix4x4 matrix) {
 	return Vector3(x, y, z);
 }
 
+// OBBのWorldMatrixの作成
+Matrix4x4 CreateOBBWorldMatrix(const OBB& obb) {
+	// ローカル座標系での変換行列を作成
+	Matrix3x3 localMatrix;
+	for (int i = 0; i < 3; ++i) {
+		localMatrix.m[i][0] = obb.orientations[i].x;
+		localMatrix.m[i][1] = obb.orientations[i].y;
+		localMatrix.m[i][2] = obb.orientations[i].z;
+	}
+
+	// ワールド座標系への変換行列を作成
+	Matrix4x4 worldMatrix;
+	worldMatrix.m[3][0] = obb.center.x;
+	worldMatrix.m[3][1] = obb.center.y;
+	worldMatrix.m[3][2] = obb.center.z;
+
+	for (int i = 0; i < 3; ++i) {
+		for (int j = 0; j < 3; ++j) {
+			worldMatrix.m[i][j] = localMatrix.m[i][j];
+		}
+	}
+
+	// 回転成分以外の部分を設定
+	worldMatrix.m[0][3] = 0.0f;
+	worldMatrix.m[1][3] = 0.0f;
+	worldMatrix.m[2][3] = 0.0f;
+	worldMatrix.m[3][3] = 1.0f;
+
+	return worldMatrix;
+}
+
 // 正射影ベクトル
 Vector3 Project(const Vector3& v1, const Vector3& v2) {
 

@@ -164,6 +164,7 @@ bool IsCollision(const AABB& aabb, const Sphere& sphere) {
 	}
 }
 
+// AABBと線の当たり判定
 bool IsCollision(const AABB& aabb, const Segment& segment) {
 	float tmin = 0.0f; // 線分の始点
 	float tmax = 1.0f; // 線分の終点
@@ -196,4 +197,37 @@ bool IsCollision(const AABB& aabb, const Segment& segment) {
 	}
 
 	return true; // 衝突あり
+}
+
+// OBBと球の当たり判定(ローカル空間)
+bool IsCollision(const OBB& obb, const Sphere& sphere) {
+
+	// OBBのワールド行列を作成
+	Matrix4x4 worldMatrix = CreateOBBWorldMatrix(obb);
+
+	// 球の中心をワールド座標系からローカル座標系に変換
+	Vector3 worldToOBB = sphere.center - obb.center;
+	Vector3 localSphereCenter;
+	localSphereCenter.x = worldMatrix.m[0][0] * worldToOBB.x + worldMatrix.m[1][0] * worldToOBB.y + worldMatrix.m[2][0] * worldToOBB.z;
+	localSphereCenter.y = worldMatrix.m[0][1] * worldToOBB.x + worldMatrix.m[1][1] * worldToOBB.y + worldMatrix.m[2][1] * worldToOBB.z;
+	localSphereCenter.z = worldMatrix.m[0][2] * worldToOBB.x + worldMatrix.m[1][2] * worldToOBB.y + worldMatrix.m[2][2] * worldToOBB.z;
+
+	// OBBの各軸に沿った球との距離を計算
+	float distX = fabs(localSphereCenter.x) - obb.size.x;
+	float distY = fabs(localSphereCenter.y) - obb.size.y;
+	float distZ = fabs(localSphereCenter.z) - obb.size.z;
+
+	// 球とOBBの当たり判定
+	if (distX > sphere.radius || distY > sphere.radius || distZ > sphere.radius) {
+		// 球の中心がOBBの各軸に沿った境界の外側にある場合は衝突していない
+		return false;
+	}
+
+	// OBBの角からの距離を計算
+	float distToSurfaceSquared = std::max(0.0f, distX * distX + distY * distY + distZ * distZ);
+	if (distToSurfaceSquared <= sphere.radius * sphere.radius) {
+		return true;
+	} else {
+		return false;
+	}
 }

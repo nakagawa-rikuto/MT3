@@ -16,3 +16,5 @@ void DrawTriangle(const Triangle& triangle, const Matrix4x4& viewProjectionMatri
 // AABBの描画
 void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
 
+// OBBの描画
+void DrawOBB(const OBB& obb, const Matrix4x4& viewProjectionMatrix, Matrix4x4& viewportMatrix, uint32_t color);

@@ -11,6 +11,14 @@
 #include <algorithm>
 #include <vector>
 
+/// <summary>
+/// 4x4行列
+/// </summary>
+struct Matrix3x3 final {
+	float m[3][3];
+};
+
+
 // スフィアの情報
 struct Sphere {
 	Vector3 center;  // 中心
@@ -21,6 +29,13 @@ struct Sphere {
 struct AABB {
 	Vector3 min; //!<最小点
 	Vector3 max; //!<最大点
+};
+
+// OBB
+struct OBB {
+	Vector3 center;          // !<中心
+	Vector3 orientations[3]; // !<座標軸。正規化・直交必須
+	Vector3 size;            // !<座標軸方向の長さの半分。中心空面までの距離
 };
 
 // 三角形の情報
@@ -101,6 +116,9 @@ Matrix4x4 Inverse(const Matrix4x4& m);
 
 // 座標変換
 Vector3 Transform(Vector3 vector, Matrix4x4 matrix);
+
+// OBBのWorldMatrixの作成
+Matrix4x4 CreateOBBWorldMatrix(const OBB& obb);
 
 #pragma endregion
 

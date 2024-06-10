@@ -15,14 +15,20 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	char keys[256] = {0};
 	char preKeys[256] = {0};
 
-	AABB aabb1{
-		.min{-0.5f, -0.5f, -0.5f},
-		.max{0.5f, 0.5f, 0.5f}
+	Vector3 rotate = { 0.0f, 0.0f, 0.0f };
+
+	OBB obb{
+		.center = {-1.0f, 0.0f, 0.0f},
+		.orientations = {
+		{1.0f, 0.0f, 0.0f},
+		{0.0f, 1.0f, 0.0f},
+		{0.0f, 0.0f, 1.0f}},
+		.size = {0.5f, 0.5f, 0.5f}
 	};
 
-	Segment sgment{
-		.origin{-0.7f, 0.3f, 0.0f},
-		.diff{2.0f, -0.5f, 0.0f}
+	Sphere sphere{
+		.center = {0.0f, 0.0f, 0.0f},
+		.radius = 0.5f
 	};
 
 	unsigned int color = WHITE;
@@ -55,22 +61,28 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::End();
 
 		ImGui::Begin("Data");
-		ImGui::DragFloat3("AABB1.min", &aabb1.min.x, 0.01f);
-		ImGui::DragFloat3("AABB1.max", &aabb1.max.x, 0.01f);
-		ImGui::DragFloat3("Segment.orign", &sgment.origin.x, 0.01f);
-		ImGui::DragFloat3("Segment.diff", &sgment.diff.x, 0.01f);
+		ImGui::DragFloat3("OBB.center", &obb.center.x, 0.01f);
+		ImGui::DragFloat3("OBB.size", &obb.size.x, 0.01f);
+
+		ImGui::DragFloat3("rotate", &rotate.x, 0.01f);
+
+		ImGui::DragFloat3("Sphere.center", &sphere.center.x, 0.01f);
+		ImGui::DragFloat("Sphere.radius", &sphere.radius, 0.01f);
 		ImGui::End();
 
 #endif 
 
-		aabb1.min.x = (std::min)(aabb1.min.x, aabb1.max.x);
-		aabb1.max.x = (std::max)(aabb1.min.x, aabb1.max.x);
-		aabb1.min.y = (std::min)(aabb1.min.y, aabb1.max.y);
-		aabb1.max.y = (std::max)(aabb1.min.y, aabb1.max.y);
-		aabb1.min.z = (std::min)(aabb1.min.z, aabb1.max.z);
-		aabb1.max.z = (std::max)(aabb1.min.z, aabb1.max.z);
+		Vector3 centerInOBBLocalSpace =
+			Transform(sphere.center, Inverse(CreateOBBWorldMatrix(obb)));
 
-		if (IsCollision(aabb1, sgment)) {
+		AABB aabbOBBLocal { 
+			.min = {-obb.size.x, -obb.size.y, -obb.size.z},
+			.max = obb.size };
+
+		Sphere sphereOBBLocal{ centerInOBBLocalSpace, sphere.radius };
+
+		// ローカル空間で衝突判定
+		if (IsCollision(aabbOBBLocal, sphereOBBLocal)) {
 
 			color = RED;
 		} else {
@@ -86,9 +98,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Matrix4x4 wvpMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 		Matrix4x4 viewportMatrix = MakeViewportMatrix(0, 0, 1280.0f, 780.0f, 0.0f, 1.0f);
 
-		// 線のスタートとエンド
-		Vector3 start = Transform(Transform(sgment.origin, wvpMatrix), viewportMatrix);
-		Vector3 end = Transform(Transform(sgment.origin + sgment.diff, wvpMatrix), viewportMatrix);
+		// 回転行列を生成
+		Matrix4x4 rotateMatrix = Multiply(MakeRotateXMatrix(rotate.x), Multiply(MakeRotateYMatrix(rotate.y), MakeRotateZMatrix(rotate.z)));
+
+		// 回転行列から軸を抽出
+		obb.orientations[0].x = rotateMatrix.m[0][0];
+		obb.orientations[0].y = rotateMatrix.m[0][1];
+		obb.orientations[0].z = rotateMatrix.m[0][2];
+
+		obb.orientations[1].x = rotateMatrix.m[1][0];
+		obb.orientations[1].y = rotateMatrix.m[1][1];
+		obb.orientations[1].z = rotateMatrix.m[1][2];
+
+		obb.orientations[2].x = rotateMatrix.m[2][0];
+		obb.orientations[2].y = rotateMatrix.m[2][1];
+		obb.orientations[2].z = rotateMatrix.m[2][2];
 
 		///
 		/// ↑更新処理ここまで
@@ -99,8 +123,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 
 		DrawGrid(wvpMatrix, viewportMatrix);
-		DrawAABB(aabb1,wvpMatrix, viewportMatrix, color);
-		Novice::DrawLine(static_cast<int>(start.x), static_cast<int>(start.y), static_cast<int>(end.x), static_cast<int>(end.y), BLACK);
+		DrawOBB(obb, wvpMatrix, viewportMatrix, color);
+		DrawSphere(sphere, wvpMatrix, viewportMatrix, WHITE);
+		//DrawAABB(aabbOBBLocal, wvpMatrix, viewportMatrix, color);
+
 
 		///
 		/// ↑描画処理ここまで

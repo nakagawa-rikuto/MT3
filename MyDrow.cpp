@@ -191,3 +191,44 @@ void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Mat
 			static_cast<int>(std::round(end.x)), static_cast<int>(std::round(end.y)), color);
 	}
 }
+
+void DrawOBB(const OBB& obb, const Matrix4x4& viewProjectionMatrix, Matrix4x4& viewportMatrix, uint32_t color) {
+	// OBBの頂点を計算
+	std::array<Vector3, 8> vertices;
+	Vector3 halfSizeX = obb.orientations[0] * obb.size.x;
+	Vector3 halfSizeY = obb.orientations[1] * obb.size.y;
+	Vector3 halfSizeZ = obb.orientations[2] * obb.size.z;
+
+	vertices[0] = obb.center - halfSizeX - halfSizeY - halfSizeZ;
+	vertices[1] = obb.center + halfSizeX - halfSizeY - halfSizeZ;
+	vertices[2] = obb.center - halfSizeX + halfSizeY - halfSizeZ;
+	vertices[3] = obb.center + halfSizeX + halfSizeY - halfSizeZ;
+	vertices[4] = obb.center - halfSizeX - halfSizeY + halfSizeZ;
+	vertices[5] = obb.center + halfSizeX - halfSizeY + halfSizeZ;
+	vertices[6] = obb.center - halfSizeX + halfSizeY + halfSizeZ;
+	vertices[7] = obb.center + halfSizeX + halfSizeY + halfSizeZ;
+
+	// 頂点をビュー・プロジェクション行列で変換
+	for (auto& vertex : vertices) {
+		vertex = Transform(vertex, viewProjectionMatrix);
+	}
+
+	// 頂点をビューポート行列で変換
+	for (auto& vertex : vertices) {
+		vertex = Transform(vertex, viewportMatrix);
+	}
+
+	// OBBのエッジを描画
+	std::array<std::pair<int, int>, 12> edges = {
+		std::make_pair(0, 1), std::make_pair(1, 3), std::make_pair(3, 2), std::make_pair(2, 0), // 下の面
+		std::make_pair(4, 5), std::make_pair(5, 7), std::make_pair(7, 6), std::make_pair(6, 4), // 上の面
+		std::make_pair(0, 4), std::make_pair(1, 5), std::make_pair(2, 6), std::make_pair(3, 7)  // 側面
+	};
+
+	for (const auto& edge : edges) {
+		Novice::DrawLine(
+			static_cast<int>(vertices[edge.first].x), static_cast<int>(vertices[edge.first].y), 
+			static_cast<int>(vertices[edge.second].x), static_cast<int>(vertices[edge.second].y), 
+			color);
+	}
+}
