@@ -279,7 +279,7 @@ Vector3 Project(const Vector3& v1, const Vector3& v2) {
 	return Vector3(unitV2.x * projectLength, unitV2.y * projectLength, unitV2.z * projectLength);
 }
 
-// 最近接点
+// 最近接点(線	)
 Vector3 ClosestPoint(const Vector3& point, const Segment& segment) {
 
 	// 線分の方向ベクトル
@@ -306,6 +306,7 @@ Vector3 ClosestPoint(const Vector3& point, const Segment& segment) {
 	return closest;
 }
 
+// 最近接点(AABB)
 Vector3 ClosestPoint(const Vector3& point, const AABB& aabb) {
 
 	Vector3 closest;
