@@ -17,12 +17,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	AABB aabb1{
 		.min{-0.5f, -0.5f, -0.5f},
-		.max{0.0f, 0.0f, 0.0f}
+		.max{0.5f, 0.5f, 0.5f}
 	};
 
-	Sphere sphere{
-		.center{-1.0f, 0.0f, 0.0f},
-		.radius = 1.0f
+	Segment sgment{
+		.origin{-0.7f, 0.3f, 0.0f},
+		.diff{2.0f, -0.5f, 0.0f}
 	};
 
 	unsigned int color = WHITE;
@@ -57,8 +57,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::Begin("Data");
 		ImGui::DragFloat3("AABB1.min", &aabb1.min.x, 0.01f);
 		ImGui::DragFloat3("AABB1.max", &aabb1.max.x, 0.01f);
-		ImGui::DragFloat3("Sphere.center", &sphere.center.x, 0.01f);
-		ImGui::DragFloat("Sphere.radius", &sphere.radius, 0.01f);
+		ImGui::DragFloat3("Segment.orign", &sgment.origin.x, 0.01f);
+		ImGui::DragFloat3("Segment.diff", &sgment.diff.x, 0.01f);
 		ImGui::End();
 
 #endif 
@@ -70,7 +70,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		aabb1.min.z = (std::min)(aabb1.min.z, aabb1.max.z);
 		aabb1.max.z = (std::max)(aabb1.min.z, aabb1.max.z);
 
-		if (IsCollision(aabb1, sphere)) {
+		if (IsCollision(aabb1, sgment)) {
 
 			color = RED;
 		} else {
@@ -86,6 +86,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Matrix4x4 wvpMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 		Matrix4x4 viewportMatrix = MakeViewportMatrix(0, 0, 1280.0f, 780.0f, 0.0f, 1.0f);
 
+		// 線のスタートとエンド
+		Vector3 start = Transform(Transform(sgment.origin, wvpMatrix), viewportMatrix);
+		Vector3 end = Transform(Transform(sgment.origin + sgment.diff, wvpMatrix), viewportMatrix);
+
 		///
 		/// ↑更新処理ここまで
 		///
@@ -96,7 +100,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		DrawGrid(wvpMatrix, viewportMatrix);
 		DrawAABB(aabb1,wvpMatrix, viewportMatrix, color);
-		DrawSphere(sphere, wvpMatrix, viewportMatrix, WHITE);
+		Novice::DrawLine(static_cast<int>(start.x), static_cast<int>(start.y), static_cast<int>(end.x), static_cast<int>(end.y), BLACK);
 
 		///
 		/// ↑描画処理ここまで

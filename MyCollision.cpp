@@ -163,3 +163,37 @@ bool IsCollision(const AABB& aabb, const Sphere& sphere) {
 		return false;
 	}
 }
+
+bool IsCollision(const AABB& aabb, const Segment& segment) {
+	float tmin = 0.0f; // 線分の始点
+	float tmax = 1.0f; // 線分の終点
+
+	Vector3 p = segment.origin; // 線分の始点
+	Vector3 d = segment.diff;   // 線分の方向ベクトル
+
+	// 各軸 (x, y, z) についての判定
+	for (int i = 0; i < 3; ++i) {
+		float min = (&aabb.min.x)[i]; // AABBの最小点
+		float max = (&aabb.max.x)[i]; // AABBの最大点
+		float o = (&p.x)[i];          // 線分の始点の位置
+		float dir = (&d.x)[i];        // 線分の方向ベクトルの成分
+
+		// 方向ベクトルの成分がほぼ0の場合
+		if (std::abs(dir) < 1e-8) {
+			// 線分の始点がAABBの範囲外であれば衝突なし
+			if (o < min || o > max) return false;
+		} else {
+			// 方向ベクトルの成分が非0の場合、交差区間を計算
+			float invDir = 1.0f / dir;
+			float t1 = (min - o) * invDir;
+			float t2 = (max - o) * invDir;
+			if (t1 > t2) std::swap(t1, t2); // t1とt2を入れ替える
+			tmin = std::max(tmin, t1); // tminを更新
+			tmax = std::min(tmax, t2); // tmaxを更新
+			// tminがtmaxを超えた場合、交差はない
+			if (tmin > tmax) return false;
+		}
+	}
+
+	return true; // 衝突あり
+}

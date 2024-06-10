@@ -9,6 +9,7 @@
 #include <array>
 #include <cstdint>
 #include <algorithm>
+#include <vector>
 
 // スフィアの情報
 struct Sphere {
