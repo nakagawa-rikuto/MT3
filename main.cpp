@@ -16,19 +16,24 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	char preKeys[256] = {0};
 
 	Vector3 rotate = { 0.0f, 0.0f, 0.0f };
+	Vector3 rotate2 = { -0.05f, -2.49f, 0.15f };
 
 	OBB obb{
-		.center = {-1.0f, 0.0f, 0.0f},
+		.center = {0.0f, 0.0f, 0.0f},
 		.orientations = {
 		{1.0f, 0.0f, 0.0f},
 		{0.0f, 1.0f, 0.0f},
 		{0.0f, 0.0f, 1.0f}},
-		.size = {0.5f, 0.5f, 0.5f}
+		.size = {0.83f, 0.26f, 0.24f}
 	};
 
-	Segment segment{
-		.origin = {-0.7f, 0.3f, 0.0f},
-		.diff = {2.0f, -0.5f, 0.0f}
+	OBB obb2{
+		.center = {0.9f, 0.66f, 0.78f},
+		.orientations = {
+		{1.0f, 0.0f, 0.0f},
+		{0.0f, 1.0f, 0.0f},
+		{0.0f, 0.0f, 1.0f}},
+		.size = {0.5f, 0.37f, 0.5f}
 	};
 
 	unsigned int color = WHITE;
@@ -66,8 +71,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		ImGui::DragFloat3("rotate", &rotate.x, 0.01f);
 
-		ImGui::DragFloat3("Segment.orign", &segment.origin.x, 0.01f);
-		ImGui::DragFloat3("Segment.diff", &segment.diff.x, 0.01f);
+		ImGui::DragFloat3("OBB.center2", &obb2.center.x, 0.01f);
+		ImGui::DragFloat3("OBB.size2", &obb2.size.x, 0.01f);
+
+		ImGui::DragFloat3("rotate2", &rotate2.x, 0.01f);
 		ImGui::End();
 
 #endif 
@@ -75,7 +82,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		
 
 		// ローカル空間で衝突判定
-		if (IsCollision(segment, obb)) {
+		if (IsCollision(obb, obb2)) {
 
 			color = RED;
 		} else {
@@ -97,6 +104,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		*/ //////////////////////////////
 		// 回転行列を生成
 		Matrix4x4 rotateMatrix = Multiply(MakeRotateXMatrix(rotate.x), Multiply(MakeRotateYMatrix(rotate.y), MakeRotateZMatrix(rotate.z)));
+		Matrix4x4 rotateMatrix2 = Multiply(MakeRotateXMatrix(rotate2.x), Multiply(MakeRotateYMatrix(rotate2.y), MakeRotateZMatrix(rotate2.z)));
 
 		// 回転行列から軸を抽出
 		obb.orientations[0].x = rotateMatrix.m[0][0];
@@ -111,9 +119,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		obb.orientations[2].y = rotateMatrix.m[2][1];
 		obb.orientations[2].z = rotateMatrix.m[2][2];
 
-		// 線のスタートとエンド
-		Vector3 start = Transform(Transform(segment.origin, wvpMatrix), viewportMatrix);
-		Vector3 end = Transform(Transform(segment.origin + segment.diff, wvpMatrix), viewportMatrix);
+		obb2.orientations[0].x = rotateMatrix2.m[0][0];
+		obb2.orientations[0].y = rotateMatrix2.m[0][1];
+		obb2.orientations[0].z = rotateMatrix2.m[0][2];
+
+		obb2.orientations[1].x = rotateMatrix2.m[1][0];
+		obb2.orientations[1].y = rotateMatrix2.m[1][1];
+		obb2.orientations[1].z = rotateMatrix2.m[1][2];
+
+		obb2.orientations[2].x = rotateMatrix2.m[2][0];
+		obb2.orientations[2].y = rotateMatrix2.m[2][1];
+		obb2.orientations[2].z = rotateMatrix2.m[2][2];
 
 		///
 		/// ↑更新処理ここまで
@@ -125,7 +141,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		DrawGrid(wvpMatrix, viewportMatrix);
 		DrawOBB(obb, wvpMatrix, viewportMatrix, color);
-		Novice::DrawLine(static_cast<int>(start.x), static_cast<int>(start.y), static_cast<int>(end.x), static_cast<int>(end.y), BLACK);
+		DrawOBB(obb2, wvpMatrix, viewportMatrix, WHITE);
 		
 		///
 		/// ↑描画処理ここまで
