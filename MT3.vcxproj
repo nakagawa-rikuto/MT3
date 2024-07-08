@@ -108,6 +108,7 @@ xcopy C:\KamataEngine\DirectXGame\Resources "$(OutDirFullPath)NoviceResources" /
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\..\..\KamataEngine\DirectXGame\math\Matrix4x4.cpp" />
     <ClCompile Include="MyCollision.cpp" />
     <ClCompile Include="MyDrow.cpp" />
     <ClCompile Include="MyMath.cpp" />

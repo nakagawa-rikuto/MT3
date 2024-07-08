@@ -15,43 +15,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	char keys[256] = {0};
 	char preKeys[256] = {0};
 
-	WorldTransform shoulder = {
-		{0.2f, 1.0f, 0.0f},
-		{0.0f, 0.0f, -6.8f},
-		{1.0f, 1.0f, 1.0f}
-	};
-
-	WorldTransform elbow = {
-		{0.4f, 0.0f, 0.0f},
-		{0.0f, 0.0f, -1.4f},
-		{1.0f, 1.0f, 1.0f}
-	};
-
-	WorldTransform hand = {
-		{0.3f, 0.0f, 0.0f},
-		{0.0f, 0.0f, 0.0f},
-		{1.0f, 1.0f, 1.0f}
-	};
-
-	Sphere sphere1 = {
-		shoulder.translates,
-		0.1f
-	};
-
-	Sphere sphere2 = {
-		elbow.translates,
-		0.1f
-	};
-
-	Sphere sphere3 = {
-		hand.translates,
-		0.1f
-	};
+	Vector3 a{ 0.2f, 1.0f, 0.0f };
+	Vector3 b{ 2.4f, 3.1f, 1.2f };
+	Vector3 c = a + b;
+	Vector3 d = a - b;
+	Vector3 e = a * 2.4f;
+	Vector3 rotate{ 0.4f, 1.43f, -0.8f };
+	Matrix4x4 rotateXMatrix = MakeRotateXMatrix(rotate.x);
+	Matrix4x4 rotateYMatrix = MakeRotateYMatrix(rotate.y);
+	Matrix4x4 rotateZMatrix = MakeRotateZMatrix(rotate.z);
+	Matrix4x4 rotateMatrix = rotateXMatrix * rotateYMatrix * rotateZMatrix;
 
 	//unsigned int color = WHITE;
 
-	Vector3 cameraTranslate = { 0.0f, 3.0f, -6.0f };
-	Vector3 cameraRotate = { 0.26f, 0.0f, 0.0f };
+	/*Vector3 cameraTranslate = { 0.0f, 3.0f, -6.0f };
+	Vector3 cameraRotate = { 0.26f, 0.0f, 0.0f };*/
 	
 
 	// ウィンドウの×ボタンが押されるまでループ
@@ -72,60 +50,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		*/ ///////////////////////////////
 #ifdef  _DEBUG
 
-		ImGui::Begin("Camera");
-		ImGui::DragFloat3("CameraTranslate", &cameraTranslate.x, 0.01f);
-		ImGui::DragFloat3("CameraRotate", &cameraRotate.x, 0.01f);
-		ImGui::End();
+		ImGui::Begin("Window");
+		ImGui::Text("c:%f, %f, %f", c.x, c.y, c.z);
+		ImGui::Text("d:%f, %f, %f", d.x, d.y, d.z);
+		ImGui::Text("e:%f, %f, %f", e.x, e.y, e.z);
 
-		ImGui::Begin("Data");
-		ImGui::DragFloat3("shoulder.translates", &shoulder.translates.x, 0.01f);
-		ImGui::DragFloat3("shoulder.rotates", &shoulder.rotates.x, 0.01f);
-		ImGui::DragFloat3("shoulder.scales", &shoulder.scales.x, 0.01f);
-
-		ImGui::DragFloat3("elbow.translates", &elbow.translates.x, 0.01f);
-		ImGui::DragFloat3("elbow.rotates", &elbow.rotates.x, 0.01f);
-		ImGui::DragFloat3("elbow.scales", &elbow.scales.x, 0.01f);
-
-		ImGui::DragFloat3("hand.translates", &hand.translates.x, 0.01f);
-		ImGui::DragFloat3("hand.rotates", &hand.rotates.x, 0.01f);
-		ImGui::DragFloat3("hand.scales", &hand.scales.x, 0.01f);
-
-		ImGui::DragFloat3("Sphere1", &sphere1.center.x, 0.01f);
-		ImGui::DragFloat3("Sphere2", &sphere2.center.x, 0.01f);
-		ImGui::DragFloat3("Sphere3", &sphere3.center.x, 0.01f);
+		ImGui::Text("matrix:\n%f, %f, %f, %f\n%f, %f, %f, %f\n%f, %f, %f, %f\n%f, %f, %f, %f\n",
+			rotateMatrix.m[0][0], rotateMatrix.m[0][1], rotateMatrix.m[0][2], rotateMatrix.m[0][3],
+			rotateMatrix.m[1][0], rotateMatrix.m[1][1], rotateMatrix.m[1][2], rotateMatrix.m[1][3],
+			rotateMatrix.m[2][0], rotateMatrix.m[2][1], rotateMatrix.m[2][2], rotateMatrix.m[2][3],
+			rotateMatrix.m[3][0], rotateMatrix.m[3][1], rotateMatrix.m[3][2], rotateMatrix.m[3][3]);
 		ImGui::End();
 
 #endif 
-
-		// 行列の計算
-		Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f, 1.0f,1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f });
-		Matrix4x4 worldMatrixSphereS = MakeAffineMatrix(shoulder.scales, shoulder.rotates, shoulder.translates);
-		Matrix4x4 worldMatrixSphereE = Multiply(MakeAffineMatrix(elbow.scales, elbow.rotates, elbow.translates), worldMatrixSphereS);
-		Matrix4x4 worldMatrixSphereH = Multiply(MakeAffineMatrix(hand.scales, hand.rotates, hand.translates), worldMatrixSphereE);
-		Matrix4x4 worldMatrixLineS = MakeAffineMatrix({ 0.1f, 0.1f, 0.1f }, { 0.0f, 0.0f, 0.0f }, Vector3(worldMatrixSphereS.m[3][0], worldMatrixSphereS.m[3][1], worldMatrixSphereS.m[3][2]));
-		Matrix4x4 worldMatrixLineE = MakeAffineMatrix({ 0.1f, 0.1f, 0.1f }, { 0.0f, 0.0f, 0.0f }, Vector3(worldMatrixSphereE.m[3][0], worldMatrixSphereE.m[3][1], worldMatrixSphereE.m[3][2]));
-		Matrix4x4 worldMatrixLineH = MakeAffineMatrix({ 0.1f, 0.1f, 0.1f }, { 0.0f, 0.0f, 0.0f }, Vector3(worldMatrixSphereH.m[3][0], worldMatrixSphereH.m[3][1], worldMatrixSphereH.m[3][2]));
-
-		Matrix4x4 cameraMatrix = MakeAffineMatrix({ 1.0f, 1.0f, 1.0f }, cameraRotate, cameraTranslate);
-		Matrix4x4 viewMatrix = Inverse(cameraMatrix);
-		Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, 1280.0f / 780.0f, 0.1f, 100.0f);
-
-		Matrix4x4 wvpMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
-		Matrix4x4 wvpMatrixSphereS = Multiply(worldMatrixSphereS, Multiply(viewMatrix, projectionMatrix));
-		Matrix4x4 wvpMatrixSphereE = Multiply(worldMatrixSphereE, Multiply(viewMatrix, projectionMatrix));
-		Matrix4x4 wvpMatrixSphereH = Multiply(worldMatrixSphereH, Multiply(viewMatrix, projectionMatrix));
-		Matrix4x4 wvpMatrixLineS = Multiply(worldMatrixLineS, Multiply(viewMatrix, projectionMatrix));
-		Matrix4x4 wvpMatrixLineE = Multiply(worldMatrixLineE, Multiply(viewMatrix, projectionMatrix));
-		Matrix4x4 wvpMatrixLineH = Multiply(worldMatrixLineH, Multiply(viewMatrix, projectionMatrix));
-
-		Matrix4x4 viewportMatrix = MakeViewportMatrix(0, 0, 1280.0f, 720.0f, 0.0f, 1.0f);
-
-		sphere1.center = Transform(shoulder.translates, wvpMatrixSphereS);
-		//sphere1.center = Transform(sphere1.center, viewportMatrix);
-		sphere2.center = Transform(elbow.translates, wvpMatrixSphereE);
-		//sphere2.center = Transform(sphere2.center, viewportMatrix);
-		sphere3.center = Transform(hand.translates, wvpMatrixSphereH);
-		//sphere3.center = Transform(sphere3.center, viewportMatrix);
 
 		///
 		/// ↑更新処理ここまで
@@ -135,14 +72,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓描画処理ここから
 		///
 
-		DrawGrid(wvpMatrix, viewportMatrix);
-		DrawSphere(sphere1, wvpMatrixSphereS, viewportMatrix, RED);
-		DrawSphere(sphere2, wvpMatrixSphereE, viewportMatrix, GREEN);
-		DrawSphere(sphere3, wvpMatrixSphereH, viewportMatrix, BLUE);
-
-		DrawLine(sphere1.center, sphere2.center, wvpMatrixLineS, viewportMatrix, wvpMatrixLineE, viewportMatrix, WHITE);
-		DrawLine(sphere2.center, sphere3.center, wvpMatrixLineE, viewportMatrix, wvpMatrixLineH, viewportMatrix, WHITE);
-		
 		///
 		/// ↑描画処理ここまで
 		///
