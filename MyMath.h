@@ -73,6 +73,24 @@ struct Plane {
 	float distance; // !< 距離
 };
 
+// ばね
+struct Spring {
+	Vector3 anchor; // アンカー
+	float naturalLength; // 自然長
+	float stiffness; // 剛性
+	float dampingCoefficient; // 減衰係数
+};
+
+// ボール
+struct Ball {
+	Vector3 position; // 位置
+	Vector3 velocity; // 速度
+	Vector3 acceleration; // 加速度
+	float mass; // 質量
+	float radius; // 半径
+	float color; // 色
+};
+
 #pragma region /// 座標変換 ///
 // 平行移動
 Matrix4x4 MakeTranslateMatrix(const Vector3& translate);

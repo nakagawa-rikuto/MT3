@@ -2,6 +2,7 @@
 #include "MyMath.h"
 #include "MyDrow.h"
 #include "MyCollision.h"
+#include "MyExecution.h"
 #include "imgui.h"
 const char kWindowTitle[] = "LC1B_17_ナカガワ_リクト_タイトル_";
 
@@ -14,23 +15,25 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// キー入力結果を受け取る箱
 	char keys[256] = {0};
 	char preKeys[256] = {0};
-
-	Vector3 a{ 0.2f, 1.0f, 0.0f };
-	Vector3 b{ 2.4f, 3.1f, 1.2f };
-	Vector3 c = a + b;
-	Vector3 d = a - b;
-	Vector3 e = a * 2.4f;
-	Vector3 rotate{ 0.4f, 1.43f, -0.8f };
-	Matrix4x4 rotateXMatrix = MakeRotateXMatrix(rotate.x);
-	Matrix4x4 rotateYMatrix = MakeRotateYMatrix(rotate.y);
-	Matrix4x4 rotateZMatrix = MakeRotateZMatrix(rotate.z);
-	Matrix4x4 rotateMatrix = rotateXMatrix * rotateYMatrix * rotateZMatrix;
-
-	//unsigned int color = WHITE;
-
-	/*Vector3 cameraTranslate = { 0.0f, 3.0f, -6.0f };
-	Vector3 cameraRotate = { 0.26f, 0.0f, 0.0f };*/
 	
+	Spring spring{};
+	spring.anchor = { 0.0f, 0.0f, 0.0f };
+	spring.naturalLength = 1.0f;
+	spring.stiffness = 100.0f;
+	spring.dampingCoefficient = 2.0f;
+
+	Ball ball{};
+	ball.position = { 1.2f, 0.0f, 0.0f };
+	ball.mass = 2.0f;
+	ball.radius = 0.05f;
+	ball.color = BLUE;
+
+	float deltaTime = 1.0f / 60.0f;
+
+	bool isStart = false;
+
+	Vector3 cameraTranslate = { 0.0f, 3.0f, -10.0f };
+	Vector3 cameraRotate = { 0.26f, 0.0f, 0.0f };
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -51,18 +54,57 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 #ifdef  _DEBUG
 
 		ImGui::Begin("Window");
-		ImGui::Text("c:%f, %f, %f", c.x, c.y, c.z);
-		ImGui::Text("d:%f, %f, %f", d.x, d.y, d.z);
-		ImGui::Text("e:%f, %f, %f", e.x, e.y, e.z);
 
-		ImGui::Text("matrix:\n%f, %f, %f, %f\n%f, %f, %f, %f\n%f, %f, %f, %f\n%f, %f, %f, %f\n",
-			rotateMatrix.m[0][0], rotateMatrix.m[0][1], rotateMatrix.m[0][2], rotateMatrix.m[0][3],
-			rotateMatrix.m[1][0], rotateMatrix.m[1][1], rotateMatrix.m[1][2], rotateMatrix.m[1][3],
-			rotateMatrix.m[2][0], rotateMatrix.m[2][1], rotateMatrix.m[2][2], rotateMatrix.m[2][3],
-			rotateMatrix.m[3][0], rotateMatrix.m[3][1], rotateMatrix.m[3][2], rotateMatrix.m[3][3]);
+		ImGui::DragFloat3("Ball.position", &ball.position.x, 0.01f);
+		ImGui::Checkbox("isStart", &isStart);
+
 		ImGui::End();
 
 #endif 
+
+		/* //////////////////////////////////
+						実装
+		*/ //////////////////////////////////
+
+		if (isStart) {
+			Vector3 diff = ball.position - spring.anchor;
+			float length = Length(diff);
+			if (length != 0.0f) {
+				Vector3 direction = Normalize(diff);
+				Vector3 restPosition = spring.anchor + direction * spring.naturalLength;
+				Vector3 displacement = (ball.position - restPosition) * length;
+				Vector3 restoringForce = displacement * -spring.stiffness;
+				// 減衰抵抗を計算する
+				Vector3 dampingForce = ball.velocity * -spring.dampingCoefficient;
+				// 減衰抵抗も加味して、物体にかかる力を決定する。
+				Vector3 force = restoringForce + dampingForce;
+				ball.acceleration = force / ball.mass;
+			}
+
+			// 加速度も速度もどちらとも秒を基準とした値である
+			// それが、1/60秒間(deltaTime)運用されたと考える
+			ball.velocity += ball.acceleration * deltaTime;
+			ball.position += ball.velocity * deltaTime;
+		}
+
+
+		// 行列の計算
+		Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f, 1.0f,1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f });
+		Matrix4x4 worldMatrixSphere = MakeAffineMatrix({ 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 0.0f }, ball.position);
+
+		Matrix4x4 cameraMatrix = MakeAffineMatrix({ 1.0f, 1.0f, 1.0f }, cameraRotate, cameraTranslate);
+		Matrix4x4 viewMatrix = Inverse(cameraMatrix);
+		Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, 1280.0f / 780.0f, 0.1f, 100.0f);
+
+		Matrix4x4 wvpMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
+		Matrix4x4 wvpMatrixSphere = Multiply(worldMatrixSphere, Multiply(viewMatrix, projectionMatrix));
+
+		Matrix4x4 viewportMatrix = MakeViewportMatrix(0, 0, 1280.0f, 720.0f, 0.0f, 1.0f);
+
+		Sphere sphere = {
+			Transform(ball.position, wvpMatrixSphere),
+			0.1f
+		};
 
 		///
 		/// ↑更新処理ここまで
@@ -71,6 +113,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 		/// ↓描画処理ここから
 		///
+
+		DrawGrid(wvpMatrix, viewportMatrix);
+		DrawSphere(sphere, wvpMatrixSphere, viewportMatrix, static_cast<int>(ball.color));
+		DrawLine(ball.position, spring.anchor, wvpMatrix, viewportMatrix, wvpMatrix, viewportMatrix, WHITE);
 
 		///
 		/// ↑描画処理ここまで

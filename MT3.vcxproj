@@ -111,6 +111,7 @@ xcopy C:\KamataEngine\DirectXGame\Resources "$(OutDirFullPath)NoviceResources" /
     <ClCompile Include="..\..\..\..\..\..\..\KamataEngine\DirectXGame\math\Matrix4x4.cpp" />
     <ClCompile Include="MyCollision.cpp" />
     <ClCompile Include="MyDrow.cpp" />
+    <ClCompile Include="MyExecution.cpp" />
     <ClCompile Include="MyMath.cpp" />
     <ClCompile Include="C:\KamataEngine\DirectXGame\base\StringUtility.cpp" />
     <ClCompile Include="C:\KamataEngine\DirectXGame\base\DirectXCommon.cpp" />
@@ -127,6 +128,7 @@ xcopy C:\KamataEngine\DirectXGame\Resources "$(OutDirFullPath)NoviceResources" /
   <ItemGroup>
     <ClInclude Include="MyCollision.h" />
     <ClInclude Include="MyDrow.h" />
+    <ClInclude Include="MyExecution.h" />
     <ClInclude Include="MyMath.h" />
     <ClInclude Include="C:\KamataEngine\DirectXGame\base\StringUtility.h" />
     <ClInclude Include="C:\KamataEngine\DirectXGame\math\Matrix4x4.h" />
