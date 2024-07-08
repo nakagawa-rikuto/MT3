@@ -72,20 +72,19 @@ void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, con
 
 			// world座標系でのa, b, cを求める
 			Vector3 a, b, c;
-			a = { sphere.radius * std::cos(lon) * std::cos(lat) + sphere.center.x,
-				  sphere.radius * std::sin(lon) + sphere.center.y,
-				  sphere.radius * std::cos(lon) * std::sin(lat) + sphere.center.z };
+			a = { sphere.radius * std::cos(lon) * std::cos(lat),
+				  sphere.radius * std::sin(lon),
+				  sphere.radius * std::cos(lon) * std::sin(lat) };
 
-			b = { sphere.radius * std::cos(lon + kLonEvery) * std::cos(lat) + sphere.center.x,
-				  sphere.radius * std::sin(lon + kLonEvery) + sphere.center.y,
-				  sphere.radius * std::cos(lon + kLonEvery) * std::sin(lat) + sphere.center.z };
+			b = { sphere.radius * std::cos(lon + kLonEvery) * std::cos(lat),
+				  sphere.radius * std::sin(lon + kLonEvery),
+				  sphere.radius * std::cos(lon + kLonEvery) * std::sin(lat) };
 
-			c = { sphere.radius * std::cos(lon) * std::cos(lat + kLatEvery) + sphere.center.x,
-				  sphere.radius * std::sin(lon) + sphere.center.y,
-				  sphere.radius * std::cos(lon) * std::sin(lat + kLatEvery) + sphere.center.z };
+			c = { sphere.radius * std::cos(lon) * std::cos(lat + kLatEvery),
+				  sphere.radius * std::sin(lon),
+				  sphere.radius * std::cos(lon) * std::sin(lat + kLatEvery) };
 
 			// a,b,cをScreen座標系まで変換
-
 
 			Vector3 screenA = Transform(a, viewProjectionMatrix);
 			Vector3 screenB = Transform(b, viewProjectionMatrix);
