@@ -15,10 +15,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	char keys[256] = {0};
 	char preKeys[256] = {0};
 
-	Vector3 controlPoints[3] = {
-		{-0.8f, 0.58f, 1.0f},
-		{1.76f, 1.0f, -0.3f},
-		{0.94f, -0.7f, 2.0f},
+	WorldTransform shoulder = {
+		{0.2f, 1.0f, 0.0f},
+		{0.0f, 0.0f, -6.8f},
+		{1.0f, 1.0f, 1.0f}
+	};
+
+	WorldTransform elbow = {
+		{0.4f, 0.0f, 0.0f},
+		{0.0f, 0.0f, -1.4f},
+		{1.0f, 1.0f, 1.0f}
+	};
+
+	WorldTransform hand = {
+		{0.3f, 0.0f, 0.0f},
+		{0.0f, 0.0f, 0.0f},
+		{1.0f, 1.0f, 1.0f}
 	};
 
 	unsigned int color = WHITE;
@@ -51,23 +63,20 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::End();
 
 		ImGui::Begin("Data");
-		ImGui::DragFloat3("Bezier1", &controlPoints[0].x, 0.01f);
-		ImGui::DragFloat3("Bezier2", &controlPoints[1].x, 0.01f);
-		ImGui::DragFloat3("Bezier3", &controlPoints[2].x, 0.01f);
+		ImGui::DragFloat3("shoulder.translates", &shoulder.translates.x, 0.01f);
+		ImGui::DragFloat3("shoulder.rotates", &shoulder.rotates.x, 0.01f);
+		ImGui::DragFloat3("shoulder.scales", &shoulder.scales.x, 0.01f);
+
+		ImGui::DragFloat3("elbow.translates", &elbow.translates.x, 0.01f);
+		ImGui::DragFloat3("elbow.rotates", &elbow.rotates.x, 0.01f);
+		ImGui::DragFloat3("elbow.scales", &elbow.scales.x, 0.01f);
+
+		ImGui::DragFloat3("hand.translates", &hand.translates.x, 0.01f);
+		ImGui::DragFloat3("hand.rotates", &hand.rotates.x, 0.01f);
+		ImGui::DragFloat3("hand.scales", &hand.scales.x, 0.01f);
 		ImGui::End();
 
 #endif 
-
-		
-
-		// ローカル空間で衝突判定
-		/*if (IsCollision(obb, obb2)) {
-
-			color = RED;
-		} else {
-
-			color = WHITE;
-		}*/
 
 		// 行列の計算
 		Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f, 1.0f,1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f });
@@ -86,7 +95,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 
 		DrawGrid(wvpMatrix, viewportMatrix);
-		DrawBezier(controlPoints[0], controlPoints[1], controlPoints[2], wvpMatrix, viewportMatrix, color);
+		DrawSphere(shoulder, wvpMatrix, viewportMatrix, color);
+		DrawSphere(elbow, wvpMatrix, viewportMatrix, color);
+		DrawSphere(hand, wvpMatrix, viewportMatrix, color);
 		
 		///
 		/// ↑描画処理ここまで

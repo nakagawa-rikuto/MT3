@@ -55,7 +55,7 @@ void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMa
 	}
 }
 
-// スフィアの描画
+// スフィアの描画(Sphereの情報)
 void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color) {
 
 	const uint32_t kSubdivision = 16; // 分散数
@@ -87,6 +87,56 @@ void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, con
 			// a,b,cをScreen座標系まで変換
 
 
+			Vector3 screenA = Transform(a, viewProjectionMatrix);
+			Vector3 screenB = Transform(b, viewProjectionMatrix);
+			Vector3 screenC = Transform(c, viewProjectionMatrix);
+
+			screenA = Transform(screenA, viewportMatrix);
+			screenB = Transform(screenB, viewportMatrix);
+			screenC = Transform(screenC, viewportMatrix);
+
+			// ab, bcで線を引く
+			Novice::DrawLine(static_cast<int>(screenA.x), static_cast<int>(screenA.y), static_cast<int>(screenB.x), static_cast<int>(screenB.y), color);
+			Novice::DrawLine(static_cast<int>(screenA.x), static_cast<int>(screenA.y), static_cast<int>(screenC.x), static_cast<int>(screenC.y), color);
+		}
+	}
+}
+
+// スフィアの描画(WorldTransform)
+void DrawSphere(const WorldTransform& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color) {
+	const uint32_t kSubdivision = 16; // 分散数
+	const float kLatEvery = static_cast<float>(M_PI) / kSubdivision; // 経度分割1つの角度
+	const float kLonEvery = static_cast<float>(2 * M_PI) / kSubdivision; // 緯度分割1つの角度
+
+	// 緯度の方向に分割 -π/2 ~ π/2
+	for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex) {
+		float lat = -static_cast<float>(M_PI) / 2.0f + kLatEvery * latIndex; // 現在の緯度
+
+		// 経度の方向に分割 0 ~ 2π
+		for (uint32_t lonIndex = 0; lonIndex < kSubdivision; ++lonIndex) {
+			float lon = lonIndex * kLonEvery; // 現在の経度
+
+			// world座標系でのa, b, cを求める
+			Vector3 a, b, c;
+			a = {
+				sphere.scales.x * sphere.translates.x * std::cos(lon) * std::cos(lat) + sphere.translates.x,
+				sphere.scales.y * sphere.translates.y * std::sin(lon) + sphere.translates.y,
+				sphere.scales.z * sphere.translates.z * std::cos(lon) * std::sin(lat) + sphere.translates.z
+			};
+
+			b = {
+				sphere.scales.x * sphere.translates.x * std::cos(lon + kLonEvery) * std::cos(lat) + sphere.translates.x,
+				sphere.scales.y * sphere.translates.y * std::sin(lon + kLonEvery) + sphere.translates.y,
+				sphere.scales.z * sphere.translates.z * std::cos(lon + kLonEvery) * std::sin(lat) + sphere.translates.z
+			};
+
+			c = {
+				sphere.scales.x * sphere.translates.x * std::cos(lon) * std::cos(lat + kLatEvery) + sphere.translates.x,
+				sphere.scales.y * sphere.translates.y * std::sin(lon) + sphere.translates.y,
+				sphere.scales.z * sphere.translates.z * std::cos(lon) * std::sin(lat + kLatEvery) + sphere.translates.z
+			};
+
+			// a,b,cをScreen座標系まで変換
 			Vector3 screenA = Transform(a, viewProjectionMatrix);
 			Vector3 screenB = Transform(b, viewProjectionMatrix);
 			Vector3 screenC = Transform(c, viewProjectionMatrix);

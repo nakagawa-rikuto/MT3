@@ -12,12 +12,18 @@
 #include <vector>
 
 /// <summary>
-/// 4x4行列
+/// 3x3行列
 /// </summary>
 struct Matrix3x3 final {
 	float m[3][3];
 };
 
+// WorldTransform
+struct WorldTransform {
+	Vector3 translates;
+	Vector3 rotates;
+	Vector3 scales;
+};
 
 // スフィアの情報
 struct Sphere {
