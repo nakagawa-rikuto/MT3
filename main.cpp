@@ -15,25 +15,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	char keys[256] = {0};
 	char preKeys[256] = {0};
 
-	Vector3 rotate = { 0.0f, 0.0f, 0.0f };
-	Vector3 rotate2 = { -0.05f, -2.49f, 0.15f };
-
-	OBB obb{
-		.center = {0.0f, 0.0f, 0.0f},
-		.orientations = {
-		{1.0f, 0.0f, 0.0f},
-		{0.0f, 1.0f, 0.0f},
-		{0.0f, 0.0f, 1.0f}},
-		.size = {0.83f, 0.26f, 0.24f}
-	};
-
-	OBB obb2{
-		.center = {0.9f, 0.66f, 0.78f},
-		.orientations = {
-		{1.0f, 0.0f, 0.0f},
-		{0.0f, 1.0f, 0.0f},
-		{0.0f, 0.0f, 1.0f}},
-		.size = {0.5f, 0.37f, 0.5f}
+	Vector3 controlPoints[3] = {
+		{-0.8f, 0.58f, 1.0f},
+		{1.76f, 1.0f, -0.3f},
+		{0.94f, -0.7f, 2.0f},
 	};
 
 	unsigned int color = WHITE;
@@ -66,15 +51,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::End();
 
 		ImGui::Begin("Data");
-		ImGui::DragFloat3("OBB.center", &obb.center.x, 0.01f);
-		ImGui::DragFloat3("OBB.size", &obb.size.x, 0.01f);
-
-		ImGui::DragFloat3("rotate", &rotate.x, 0.01f);
-
-		ImGui::DragFloat3("OBB.center2", &obb2.center.x, 0.01f);
-		ImGui::DragFloat3("OBB.size2", &obb2.size.x, 0.01f);
-
-		ImGui::DragFloat3("rotate2", &rotate2.x, 0.01f);
+		ImGui::DragFloat3("Bezier1", &controlPoints[0].x, 0.01f);
+		ImGui::DragFloat3("Bezier2", &controlPoints[1].x, 0.01f);
+		ImGui::DragFloat3("Bezier3", &controlPoints[2].x, 0.01f);
 		ImGui::End();
 
 #endif 
@@ -82,13 +61,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		
 
 		// ローカル空間で衝突判定
-		if (IsCollision(obb, obb2)) {
+		/*if (IsCollision(obb, obb2)) {
 
 			color = RED;
 		} else {
 
 			color = WHITE;
-		}
+		}*/
 
 		// 行列の計算
 		Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f, 1.0f,1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f });
@@ -97,39 +76,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, 1280.0f / 780.0f, 0.1f, 100.0f);
 		Matrix4x4 wvpMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 		Matrix4x4 viewportMatrix = MakeViewportMatrix(0, 0, 1280.0f, 780.0f, 0.0f, 1.0f);
-
-
-		/* //////////////////////////////
-		            OBBの回転
-		*/ //////////////////////////////
-		// 回転行列を生成
-		Matrix4x4 rotateMatrix = Multiply(MakeRotateXMatrix(rotate.x), Multiply(MakeRotateYMatrix(rotate.y), MakeRotateZMatrix(rotate.z)));
-		Matrix4x4 rotateMatrix2 = Multiply(MakeRotateXMatrix(rotate2.x), Multiply(MakeRotateYMatrix(rotate2.y), MakeRotateZMatrix(rotate2.z)));
-
-		// 回転行列から軸を抽出
-		obb.orientations[0].x = rotateMatrix.m[0][0];
-		obb.orientations[0].y = rotateMatrix.m[0][1];
-		obb.orientations[0].z = rotateMatrix.m[0][2];
-
-		obb.orientations[1].x = rotateMatrix.m[1][0];
-		obb.orientations[1].y = rotateMatrix.m[1][1];
-		obb.orientations[1].z = rotateMatrix.m[1][2];
-
-		obb.orientations[2].x = rotateMatrix.m[2][0];
-		obb.orientations[2].y = rotateMatrix.m[2][1];
-		obb.orientations[2].z = rotateMatrix.m[2][2];
-
-		obb2.orientations[0].x = rotateMatrix2.m[0][0];
-		obb2.orientations[0].y = rotateMatrix2.m[0][1];
-		obb2.orientations[0].z = rotateMatrix2.m[0][2];
-
-		obb2.orientations[1].x = rotateMatrix2.m[1][0];
-		obb2.orientations[1].y = rotateMatrix2.m[1][1];
-		obb2.orientations[1].z = rotateMatrix2.m[1][2];
-
-		obb2.orientations[2].x = rotateMatrix2.m[2][0];
-		obb2.orientations[2].y = rotateMatrix2.m[2][1];
-		obb2.orientations[2].z = rotateMatrix2.m[2][2];
 
 		///
 		/// ↑更新処理ここまで
@@ -140,8 +86,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 
 		DrawGrid(wvpMatrix, viewportMatrix);
-		DrawOBB(obb, wvpMatrix, viewportMatrix, color);
-		DrawOBB(obb2, wvpMatrix, viewportMatrix, WHITE);
+		DrawBezier(controlPoints[0], controlPoints[1], controlPoints[2], wvpMatrix, viewportMatrix, color);
 		
 		///
 		/// ↑描画処理ここまで

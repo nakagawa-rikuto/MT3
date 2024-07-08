@@ -253,7 +253,7 @@ Vector3 Transform(Vector3 vector, Matrix4x4 matrix) {
 	float y = vector.x * matrix.m[0][1] + vector.y * matrix.m[1][1] + vector.z * matrix.m[2][1] + matrix.m[3][1];
 	float z = vector.x * matrix.m[0][2] + vector.y * matrix.m[1][2] + vector.z * matrix.m[2][2] + matrix.m[3][2];
 	float w = vector.x * matrix.m[0][3] + vector.y * matrix.m[1][3] + vector.z * matrix.m[2][3] + matrix.m[3][3];
-	// Ensure w is not zero to avoid division by zero
+	// w がゼロではないことを確認し、ゼロ除算を回避
 	if (w != 0.0f) {
 		x /= w;
 		y /= w;
@@ -304,7 +304,7 @@ Vector3 Project(const Vector3& v1, const Vector3& v2) {
 	{ v2.x * (1.0f / lengthSquared), v2.y * (1.0f / lengthSquared), v2.z * (1.0f / lengthSquared) };
 
 	// v1をv2に対して正射影する
-	float projectLength = 
+	float projectLength =
 	{ v1.x * unitV2.x + v1.y * unitV2.y + v1.z * unitV2.z };
 
 	return Vector3(unitV2.x * projectLength, unitV2.y * projectLength, unitV2.z * projectLength);
@@ -324,13 +324,13 @@ Vector3 ClosestPoint(const Vector3& point, const Segment& segment) {
 	if (c1 <= 0) {
 		return segment.origin;
 	}
-		
+
 	float c2 = v.x * v.x + v.y * v.y + v.z * v.z;
 	// 線分の終点よりも後ろにある場合、終点が最近接点
 	if (c2 <= c1) {
 		return segment.origin + v;
 	}
-		
+
 	// 線分上にある場合、垂線の足を求める
 	float b = c1 / c2;
 	Vector3 closest = segment.origin + Vector3(v.x * b, v.y * b, v.z * b);
@@ -396,4 +396,26 @@ Vector3 Perpendicular(const Vector3& vector) {
 	}
 
 	return { 0.0f, -vector.z, vector.y };
+}
+
+// 線形補間の関数
+Vector3 Leap(const Vector3& v1, const Vector3& v2, float t) {
+
+	Vector3 lerp = { 0.0f, 0.0f, 0.0f };
+	lerp.x = t * v1.x + (1.0f - t) * v2.x;
+	lerp.y = t * v1.y + (1.0f - t) * v2.y;
+	lerp.z = t * v1.z + (1.0f - t) * v2.z;
+	return lerp;
+}
+
+// ３次元のベジュ
+Vector3 CubicBezier(const Vector3& P0, const Vector3& P1, const Vector3& P2, float t) {
+
+	// 制御点 p0, p1 を線形補間
+	Vector3 p02p1 = Leap(P0, P1, t);
+	// 制御点 p1, p2 を線形補間
+	Vector3 p12p2 = Leap(P1, P2, t);
+	// 補間点 p02p1, p12p2 をさらに線形補間
+	Vector3 p = Leap(p02p1, p12p2, t);
+	return p;
 }

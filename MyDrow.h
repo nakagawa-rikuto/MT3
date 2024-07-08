@@ -18,3 +18,6 @@ void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Mat
 
 // OBBの描画
 void DrawOBB(const OBB& obb, const Matrix4x4& viewProjectionMatrix, Matrix4x4& viewportMatrix, uint32_t color);
+
+// ベジュ曲線の描画
+void DrawBezier(const Vector3& controlPoint0, const Vector3& controlPoint1, const Vector3& controlPoint, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);

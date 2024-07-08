@@ -227,8 +227,36 @@ void DrawOBB(const OBB& obb, const Matrix4x4& viewProjectionMatrix, Matrix4x4& v
 
 	for (const auto& edge : edges) {
 		Novice::DrawLine(
-			static_cast<int>(vertices[edge.first].x), static_cast<int>(vertices[edge.first].y), 
-			static_cast<int>(vertices[edge.second].x), static_cast<int>(vertices[edge.second].y), 
+			static_cast<int>(vertices[edge.first].x), static_cast<int>(vertices[edge.first].y),
+			static_cast<int>(vertices[edge.second].x), static_cast<int>(vertices[edge.second].y),
 			color);
+	}
+}
+
+void DrawBezier(
+	const Vector3& controlPoint0, const Vector3& controlPoint1, const Vector3& controlPoint2,
+	const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color) {
+
+	const int segments = 32; // 曲線を分割するセグメント数
+
+	// 曲線上の点を計算
+	for (int i = 0; i <= segments; ++i) {
+		// t を 0 から 1 の範囲で計算
+		float t = static_cast<float>(i) / static_cast<float>(segments);
+		float nextT = static_cast<float>(i + 1) / static_cast<float>(segments);
+
+		// t に対応するベジェ曲線上の点を計算
+		Vector3 point1 = CubicBezier(controlPoint0, controlPoint1, controlPoint2, t);
+		Vector3 point2 = CubicBezier(controlPoint0, controlPoint1, controlPoint2, nextT);
+
+		Vector3 positionStart = Transform(point1, viewProjectionMatrix);
+		Vector3 positionEnd = Transform(point2, viewProjectionMatrix);
+
+		positionStart = Transform(positionStart, viewportMatrix);
+		positionEnd = Transform(positionEnd, viewportMatrix);
+
+		Novice::DrawLine(
+			static_cast<int>(positionStart.x), static_cast<int>(positionStart.y),
+			static_cast<int>(positionEnd.x), static_cast<int>(positionEnd.y), color);
 	}
 }
