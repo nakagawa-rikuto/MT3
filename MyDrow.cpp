@@ -72,20 +72,19 @@ void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, con
 
 			// world座標系でのa, b, cを求める
 			Vector3 a, b, c;
-			a = { sphere.radius * std::cos(lon) * std::cos(lat) + sphere.center.x,
-				  sphere.radius * std::sin(lon) + sphere.center.y,
-				  sphere.radius * std::cos(lon) * std::sin(lat) + sphere.center.z };
+			a = { sphere.radius * std::cos(lon) * std::cos(lat),
+				  sphere.radius * std::sin(lon),
+				  sphere.radius * std::cos(lon) * std::sin(lat) };
 
-			b = { sphere.radius * std::cos(lon + kLonEvery) * std::cos(lat) + sphere.center.x,
-				  sphere.radius * std::sin(lon + kLonEvery) + sphere.center.y,
-				  sphere.radius * std::cos(lon + kLonEvery) * std::sin(lat) + sphere.center.z };
+			b = { sphere.radius * std::cos(lon + kLonEvery) * std::cos(lat),
+				  sphere.radius * std::sin(lon + kLonEvery),
+				  sphere.radius * std::cos(lon + kLonEvery) * std::sin(lat) };
 
-			c = { sphere.radius * std::cos(lon) * std::cos(lat + kLatEvery) + sphere.center.x,
-				  sphere.radius * std::sin(lon) + sphere.center.y,
-				  sphere.radius * std::cos(lon) * std::sin(lat + kLatEvery) + sphere.center.z };
+			c = { sphere.radius * std::cos(lon) * std::cos(lat + kLatEvery),
+				  sphere.radius * std::sin(lon),
+				  sphere.radius * std::cos(lon) * std::sin(lat + kLatEvery) };
 
 			// a,b,cをScreen座標系まで変換
-
 
 			Vector3 screenA = Transform(a, viewProjectionMatrix);
 			Vector3 screenB = Transform(b, viewProjectionMatrix);
@@ -212,6 +211,7 @@ void DrawTriangle(const Triangle& triangle, const Matrix4x4& viewProjectionMatri
 		color, kFillModeWireFrame);
 }
 
+//
 void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color) {
 
 	// AABBの8つの頂点を定義
@@ -247,6 +247,7 @@ void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Mat
 	}
 }
 
+//
 void DrawOBB(const OBB& obb, const Matrix4x4& viewProjectionMatrix, Matrix4x4& viewportMatrix, uint32_t color) {
 	// OBBの頂点を計算
 	std::array<Vector3, 8> vertices;
@@ -288,6 +289,7 @@ void DrawOBB(const OBB& obb, const Matrix4x4& viewProjectionMatrix, Matrix4x4& v
 	}
 }
 
+//
 void DrawBezier(
 	const Vector3& controlPoint0, const Vector3& controlPoint1, const Vector3& controlPoint2,
 	const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color) {
@@ -316,13 +318,20 @@ void DrawBezier(
 	}
 }
 
-void DrawLine(const Vector3& pos1, const Vector3& pos2, const Matrix4x4& viewProjectionMatrix1, const Matrix4x4& viewportMatrix1, const Matrix4x4& viewProjectionMatrix2, const Matrix4x4& viewportMatrix2, uint32_t color) {
+//
+void DrawLine(
+	const Vector3& pos1, const Vector3& pos2, 
+	const Matrix4x4& viewProjectionMatrix1, const Matrix4x4& viewportMatrix1,
+	const Matrix4x4& viewProjectionMatrix2, const Matrix4x4& viewportMatrix2,
+	uint32_t color) {
 
-	Vector3 startPos = Transform(pos1, viewProjectionMatrix1);
-	Vector3 endPos = Transform(pos2, viewProjectionMatrix2);
+	Vector3 ndcStartPos = Transform(pos1, viewProjectionMatrix1);
+	Vector3 ndcEndPos = Transform(pos2, viewProjectionMatrix2);
 
-	startPos = Transform(startPos, viewportMatrix1);
-	endPos = Transform(endPos, viewportMatrix2);
+	Vector3 screenStartPos = Transform(ndcStartPos, viewportMatrix1);
+	Vector3 screenEndPos = Transform(ndcEndPos, viewportMatrix2);
 
-	Novice::DrawLine(static_cast<int>(startPos.x), static_cast<int>(startPos.y), static_cast<int>(endPos.x), static_cast<int>(endPos.y), color);
+	Novice::DrawLine(
+		static_cast<int>(screenStartPos.x), static_cast<int>(screenStartPos.y), 
+		static_cast<int>(screenEndPos.x), static_cast<int>(screenEndPos.y), color);
 }
