@@ -55,3 +55,12 @@ Vector3 const Vector3::operator*(const float& obj) const {
 
 	return sc;
 }
+
+Vector3 const Vector3::operator*(const Vector3& obj) const{
+	Vector3 sc = {};
+	sc.x = this->x * obj.x;
+	sc.y = this->y * obj.y;
+	sc.z = this->z * obj.z;
+
+	return sc;
+}

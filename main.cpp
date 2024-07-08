@@ -33,9 +33,24 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		{1.0f, 1.0f, 1.0f}
 	};
 
-	unsigned int color = WHITE;
+	Sphere sphere1 = {
+		shoulder.translates,
+		0.1f
+	};
 
-	Vector3 cameraTranslate = { 0.0f, 1.9f, -6.49f };
+	Sphere sphere2 = {
+		elbow.translates,
+		0.1f
+	};
+
+	Sphere sphere3 = {
+		hand.translates,
+		0.1f
+	};
+
+	//unsigned int color = WHITE;
+
+	Vector3 cameraTranslate = { 0.0f, 3.0f, -10.0f };
 	Vector3 cameraRotate = { 0.26f, 0.0f, 0.0f };
 	
 
@@ -80,10 +95,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		// 行列の計算
 		Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f, 1.0f,1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f });
+		Matrix4x4 worldMatrixShoulder = MakeAffineMatrix(shoulder.scales, shoulder.rotates, shoulder.translates);
+		Matrix4x4 worldMatrixElbow = Multiply(worldMatrixShoulder,MakeAffineMatrix(elbow.scales, elbow.rotates, elbow.translates));
+		Matrix4x4 worldMatrixHand = Multiply(worldMatrixElbow, MakeAffineMatrix(hand.scales, hand.rotates, hand.translates)));
+
 		Matrix4x4 cameraMatrix = MakeAffineMatrix({ 1.0f, 1.0f, 1.0f }, cameraRotate, cameraTranslate);
 		Matrix4x4 viewMatrix = Inverse(cameraMatrix);
 		Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, 1280.0f / 780.0f, 0.1f, 100.0f);
+
 		Matrix4x4 wvpMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
+		Matrix4x4 wvpMatrixShoulder = Multiply(worldMatrixShoulder, Multiply(viewMatrix, projectionMatrix));
+		Matrix4x4 wvpMatrixElbow = Multiply(worldMatrixElbow, Multiply(viewMatrix, projectionMatrix));
+		Matrix4x4 wvpMatrixHand = Multiply(worldMatrixHand, Multiply(viewMatrix, projectionMatrix));
+
 		Matrix4x4 viewportMatrix = MakeViewportMatrix(0, 0, 1280.0f, 780.0f, 0.0f, 1.0f);
 
 		///
@@ -95,9 +119,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 
 		DrawGrid(wvpMatrix, viewportMatrix);
-		DrawSphere(shoulder, wvpMatrix, viewportMatrix, color);
-		DrawSphere(elbow, wvpMatrix, viewportMatrix, color);
-		DrawSphere(hand, wvpMatrix, viewportMatrix, color);
+		DrawSphere(sphere1, wvpMatrixShoulder, viewportMatrix, RED);
+		DrawSphere(sphere2, wvpMatrixElbow, viewportMatrix, GREEN);
+		DrawSphere(sphere3, wvpMatrixHand, viewportMatrix, BLUE);
+
+		DrawLine(sphere1.center, sphere2.center, wvpMatrixShoulder, viewportMatrix, wvpMatrixElbow, viewportMatrix, WHITE);
+		DrawLine(sphere2.center, sphere3.center, wvpMatrixElbow, viewportMatrix, wvpMatrixHand, viewportMatrix, WHITE);
 		
 		///
 		/// ↑描画処理ここまで

@@ -104,9 +104,19 @@ void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, con
 
 // スフィアの描画(WorldTransform)
 void DrawSphere(const WorldTransform& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color) {
+	// スフィアの変換行列を作成する
+	Matrix4x4 sphereTransform = MakeAffineMatrix(sphere.scales, sphere.rotates, sphere.translates);
+
+	// 最終的な変換行列を計算する
+	Matrix4x4 finalMatrix = Multiply(viewProjectionMatrix, sphereTransform);
+	finalMatrix = Multiply(viewportMatrix, finalMatrix);
+
+	// スフィアの半径
+	float radius = 10.0f;
+
 	const uint32_t kSubdivision = 16; // 分散数
 	const float kLatEvery = static_cast<float>(M_PI) / kSubdivision; // 経度分割1つの角度
-	const float kLonEvery = static_cast<float>(2 * M_PI) / kSubdivision; // 緯度分割1つの角度
+	const float kLonEvery = static_cast<float>(2 * M_PI) / kSubdivision;// 緯度分割1つの角度
 
 	// 緯度の方向に分割 -π/2 ~ π/2
 	for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex) {
@@ -118,38 +128,33 @@ void DrawSphere(const WorldTransform& sphere, const Matrix4x4& viewProjectionMat
 
 			// world座標系でのa, b, cを求める
 			Vector3 a, b, c;
-			a = {
-				sphere.scales.x * sphere.translates.x * std::cos(lon) * std::cos(lat) + sphere.translates.x,
-				sphere.scales.y * sphere.translates.y * std::sin(lon) + sphere.translates.y,
-				sphere.scales.z * sphere.translates.z * std::cos(lon) * std::sin(lat) + sphere.translates.z
-			};
+			a = { radius * std::cos(lon) * std::cos(lat) + sphere.translates.x,
+				  radius * std::sin(lon) + sphere.translates.y,
+				  radius * std::cos(lon) * std::sin(lat) + sphere.translates.z };
 
-			b = {
-				sphere.scales.x * sphere.translates.x * std::cos(lon + kLonEvery) * std::cos(lat) + sphere.translates.x,
-				sphere.scales.y * sphere.translates.y * std::sin(lon + kLonEvery) + sphere.translates.y,
-				sphere.scales.z * sphere.translates.z * std::cos(lon + kLonEvery) * std::sin(lat) + sphere.translates.z
-			};
+			b = { radius * std::cos(lon + kLonEvery) * std::cos(lat) + sphere.translates.x,
+				  radius * std::sin(lon + kLonEvery) + sphere.translates.y,
+				  radius * std::cos(lon + kLonEvery) * std::sin(lat) + sphere.translates.z };
 
-			c = {
-				sphere.scales.x * sphere.translates.x * std::cos(lon) * std::cos(lat + kLatEvery) + sphere.translates.x,
-				sphere.scales.y * sphere.translates.y * std::sin(lon) + sphere.translates.y,
-				sphere.scales.z * sphere.translates.z * std::cos(lon) * std::sin(lat + kLatEvery) + sphere.translates.z
-			};
+			c = { radius * std::cos(lon) * std::cos(lat + kLatEvery) + sphere.translates.x,
+				  radius * std::sin(lon) + sphere.translates.y,
+				  radius * std::cos(lon) * std::sin(lat + kLatEvery) + sphere.translates.z };
 
 			// a,b,cをScreen座標系まで変換
-			Vector3 screenA = Transform(a, viewProjectionMatrix);
-			Vector3 screenB = Transform(b, viewProjectionMatrix);
-			Vector3 screenC = Transform(c, viewProjectionMatrix);
 
-			screenA = Transform(screenA, viewportMatrix);
-			screenB = Transform(screenB, viewportMatrix);
-			screenC = Transform(screenC, viewportMatrix);
+
+			Vector3 screenA = Transform(a, finalMatrix);
+			Vector3 screenB = Transform(b, finalMatrix);
+			Vector3 screenC = Transform(c, finalMatrix);
 
 			// ab, bcで線を引く
 			Novice::DrawLine(static_cast<int>(screenA.x), static_cast<int>(screenA.y), static_cast<int>(screenB.x), static_cast<int>(screenB.y), color);
 			Novice::DrawLine(static_cast<int>(screenA.x), static_cast<int>(screenA.y), static_cast<int>(screenC.x), static_cast<int>(screenC.y), color);
 		}
 	}
+
+	// 描画関数
+	//Novice::DrawLine(int startx, int starty, int endx, int endy, color);
 }
 
 // 平面の描画
@@ -309,4 +314,15 @@ void DrawBezier(
 			static_cast<int>(positionStart.x), static_cast<int>(positionStart.y),
 			static_cast<int>(positionEnd.x), static_cast<int>(positionEnd.y), color);
 	}
+}
+
+void DrawLine(const Vector3& pos1, const Vector3& pos2, const Matrix4x4& viewProjectionMatrix1, const Matrix4x4& viewportMatrix1, const Matrix4x4& viewProjectionMatrix2, const Matrix4x4& viewportMatrix2, uint32_t color) {
+
+	Vector3 startPos = Transform(pos1, viewProjectionMatrix1);
+	Vector3 endPos = Transform(pos2, viewProjectionMatrix2);
+
+	startPos = Transform(startPos, viewportMatrix1);
+	endPos = Transform(endPos, viewportMatrix2);
+
+	Novice::DrawLine(static_cast<int>(startPos.x), static_cast<int>(startPos.y), static_cast<int>(endPos.x), static_cast<int>(endPos.y), color);
 }

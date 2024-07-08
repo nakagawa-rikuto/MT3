@@ -6,7 +6,6 @@ void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMa
 
 // スフィアの描画
 void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
-void DrawSphere(const WorldTransform& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
 
 // 平面の描画
 void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
@@ -22,3 +21,9 @@ void DrawOBB(const OBB& obb, const Matrix4x4& viewProjectionMatrix, Matrix4x4& v
 
 // ベジュ曲線の描画
 void DrawBezier(const Vector3& controlPoint0, const Vector3& controlPoint1, const Vector3& controlPoint, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
+
+// 指定された場所と場所をつなぐ線の描画
+void DrawLine(const Vector3& pos1, const Vector3& pos2, 
+	const Matrix4x4& viewProjectionMatrix1, const Matrix4x4& viewportMatrix1, 
+	const Matrix4x4& viewProjectionMatrix2, const Matrix4x4& viewportMatrix2, 
+	uint32_t color);
