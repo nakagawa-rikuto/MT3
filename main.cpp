@@ -98,9 +98,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Matrix4x4 worldMatrixSphereS = MakeAffineMatrix(shoulder.scales, shoulder.rotates, shoulder.translates);
 		Matrix4x4 worldMatrixSphereE = Multiply(MakeAffineMatrix(elbow.scales, elbow.rotates, elbow.translates), worldMatrixSphereS);
 		Matrix4x4 worldMatrixSphereH = Multiply(MakeAffineMatrix(hand.scales, hand.rotates, hand.translates), worldMatrixSphereE);
-		Matrix4x4 worldMatrixLineS = MakeAffineMatrix({ 0.1f, 0.1f, 0.1f }, { 0.0f, 0.0f, 0.0f }, Vector3(worldMatrixSphereS.m[3][0], worldMatrixSphereS.m[3][1], worldMatrixSphereS.m[3][2]));
-		Matrix4x4 worldMatrixLineE = MakeAffineMatrix({ 0.1f, 0.1f, 0.1f }, { 0.0f, 0.0f, 0.0f }, Vector3(worldMatrixSphereE.m[3][0], worldMatrixSphereE.m[3][1], worldMatrixSphereE.m[3][2]));
-		Matrix4x4 worldMatrixLineH = MakeAffineMatrix({ 0.1f, 0.1f, 0.1f }, { 0.0f, 0.0f, 0.0f }, Vector3(worldMatrixSphereH.m[3][0], worldMatrixSphereH.m[3][1], worldMatrixSphereH.m[3][2]));
+		Matrix4x4 worldMatrixLineS = MakeAffineMatrix({ 0.1f, 0.1f, 0.1f }, { 0.0f, 0.0f, 0.0f }, 
+			Vector3(worldMatrixSphereS.m[3][0], worldMatrixSphereS.m[3][1], worldMatrixSphereS.m[3][2]));
+		Matrix4x4 worldMatrixLineE = MakeAffineMatrix({ 0.1f, 0.1f, 0.1f }, { 0.0f, 0.0f, 0.0f }, 
+			Vector3(worldMatrixSphereE.m[3][0], worldMatrixSphereE.m[3][1], worldMatrixSphereE.m[3][2]));
+		Matrix4x4 worldMatrixLineH = MakeAffineMatrix({ 0.1f, 0.1f, 0.1f }, { 0.0f, 0.0f, 0.0f }, 
+			Vector3(worldMatrixSphereH.m[3][0], worldMatrixSphereH.m[3][1], worldMatrixSphereH.m[3][2]));
 
 		Matrix4x4 cameraMatrix = MakeAffineMatrix({ 1.0f, 1.0f, 1.0f }, cameraRotate, cameraTranslate);
 		Matrix4x4 viewMatrix = Inverse(cameraMatrix);
@@ -117,11 +120,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Matrix4x4 viewportMatrix = MakeViewportMatrix(0, 0, 1280.0f, 720.0f, 0.0f, 1.0f);
 
 		sphere1.center = Transform(shoulder.translates, wvpMatrixSphereS);
-		//sphere1.center = Transform(sphere1.center, viewportMatrix);
 		sphere2.center = Transform(elbow.translates, wvpMatrixSphereE);
-		//sphere2.center = Transform(sphere2.center, viewportMatrix);
 		sphere3.center = Transform(hand.translates, wvpMatrixSphereH);
-		//sphere3.center = Transform(sphere3.center, viewportMatrix);
 
 		///
 		/// ↑更新処理ここまで
