@@ -153,3 +153,6 @@ Vector3 Leap(const Vector3& v1, const Vector3& v2, float t);
 
 // 3次元のベジュ
 Vector3 CubicBezier(const Vector3& P0, const Vector3& P1, const Vector3& P2, float t);
+
+// Catmull-Romスプラインの補間関数
+Vector3 CatmullRom(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Vector3& p3, float t);

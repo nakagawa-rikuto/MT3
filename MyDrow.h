@@ -21,3 +21,6 @@ void DrawOBB(const OBB& obb, const Matrix4x4& viewProjectionMatrix, Matrix4x4& v
 
 // ベジュ曲線の描画
 void DrawBezier(const Vector3& controlPoint0, const Vector3& controlPoint1, const Vector3& controlPoint, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
+
+// Catmull-rom曲線の描画
+void DrawCtarmullRow(const Vector3& controlPoint0, const Vector3& controlPoint1, const Vector3& controlPoint2, const Vector3& controlPoint3, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);

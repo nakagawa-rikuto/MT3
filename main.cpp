@@ -15,10 +15,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	char keys[256] = {0};
 	char preKeys[256] = {0};
 
-	Vector3 controlPoints[3] = {
+	Vector3 controlPoints[4] = {
 		{-0.8f, 0.58f, 1.0f},
 		{1.76f, 1.0f, -0.3f},
 		{0.94f, -0.7f, 2.0f},
+		{-0.53f, -0.28f, -0.15f}
 	};
 
 	unsigned int color = WHITE;
@@ -54,6 +55,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::DragFloat3("Bezier1", &controlPoints[0].x, 0.01f);
 		ImGui::DragFloat3("Bezier2", &controlPoints[1].x, 0.01f);
 		ImGui::DragFloat3("Bezier3", &controlPoints[2].x, 0.01f);
+		ImGui::DragFloat3("Bezier4", &controlPoints[3].x, 0.01f);
 		ImGui::End();
 
 #endif 
@@ -86,7 +88,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 
 		DrawGrid(wvpMatrix, viewportMatrix);
-		DrawBezier(controlPoints[0], controlPoints[1], controlPoints[2], wvpMatrix, viewportMatrix, color);
+		DrawCtarmullRow(controlPoints[0], controlPoints[1], controlPoints[2], controlPoints[3], wvpMatrix, viewportMatrix, color);
 		
 		///
 		/// ↑描画処理ここまで

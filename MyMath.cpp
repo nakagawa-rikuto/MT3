@@ -419,3 +419,18 @@ Vector3 CubicBezier(const Vector3& P0, const Vector3& P1, const Vector3& P2, flo
 	Vector3 p = Leap(p02p1, p12p2, t);
 	return p;
 }
+
+Vector3 CatmullRom(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Vector3& p3, float t)
+{
+
+	Vector3 a = Leap(p1, p2, t);
+	Vector3 b = Leap(p0, p1, t);
+	Vector3 c = Leap(p2, p3, t);
+
+	Vector3 d = Leap(b, a, t);
+	Vector3 e = Leap(a, c, t);
+
+	Vector3 p = Leap(d, e, t);
+
+	return p;
+}
