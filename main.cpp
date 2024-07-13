@@ -22,12 +22,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	ball.radius = 0.05f;
 	ball.color = BLUE;
 
-	Pendulum pendulum{
+	ConicalPendulum pendulum{
 		.anchor = {0.0f, 1.0f, 0.0f},
 		.length = 0.8f,
-		.angle = 0.7f,
-		.angleVelocity = 0.0f,
-		.angularAcceleration = 0.0f
+		.halfApexAngle = 0.7f,
+		.angle = 0.0f,
+		.angularVelocity = 0.0f
 	};
 
 	float gravity = 9.8f;
@@ -72,7 +72,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		if (isStart) {
 
-			PendulumMove(pendulum, ball.position, gravity, deltaTime);
+			ConicalPendulumMove(pendulum, ball.position, gravity, deltaTime);
 		}
 
 

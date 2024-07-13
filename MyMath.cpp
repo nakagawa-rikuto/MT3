@@ -421,7 +421,7 @@ Vector3 CubicBezier(const Vector3& P0, const Vector3& P1, const Vector3& P2, flo
 }
 
 // ばねの実装
-void SpringMove(Spring& spring, Ball& ball, float deltaTime) {
+void SpringMove(Spring& spring, Ball& ball, Vector3 gravity, float deltaTime) {
 
 	Vector3 diff = ball.position - spring.anchor;
 	float length = Length(diff);
@@ -436,6 +436,8 @@ void SpringMove(Spring& spring, Ball& ball, float deltaTime) {
 		Vector3 force = restoringForce + dampingForce;
 		ball.acceleration = force / ball.mass;
 	}
+
+	ball.acceleration += gravity;
 
 	// 加速度も速度もどちらとも秒を基準とした値である
 	// それが、1/60秒間(deltaTime)運用されたと考える
@@ -464,4 +466,17 @@ void PendulumMove(Pendulum& pendulum, Vector3& position, float gravity, float de
 	position.x = pendulum.anchor.x + std::sin(pendulum.angle) * pendulum.length;
 	position.y = pendulum.anchor.y - std::cos(pendulum.angle) * pendulum.length;
 	position.z = pendulum.anchor.z;
+}
+
+// 円錐振り子の実装
+void ConicalPendulumMove(ConicalPendulum& pendulum, Vector3& position, float gravity, float deltaTime) {
+
+	pendulum.angularVelocity = std::sqrt(gravity / (pendulum.length * std::cos(pendulum.halfApexAngle)));
+	pendulum.angle += pendulum.angularVelocity * deltaTime;
+
+	float radius = std::sin(pendulum.halfApexAngle) * pendulum.length;
+	float height = std::cos(pendulum.halfApexAngle) * pendulum.length;
+	position.x = pendulum.anchor.x + std::cos(pendulum.angle) * radius;
+	position.y = pendulum.anchor.y - height;
+	position.z = pendulum.anchor.z - std::sin(pendulum.angle) * radius;
 }

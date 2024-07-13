@@ -98,12 +98,22 @@ struct Angular {
 	float radius;
 };
 
+// 振り子
 struct Pendulum {
 	Vector3 anchor;  // アンカーポイント
 	float length;    // 紐の長さ
 	float angle;     // 現在の角度
 	float angleVelocity;        // 角速度w 
 	float angularAcceleration;  // 角加速度
+};
+
+// 円錐振り子
+struct ConicalPendulum {
+	Vector3 anchor;      // アンカーポイント
+	float length;        // 紐の長さ
+	float halfApexAngle; // 円錐の頂角の半分
+	float angle;         // 現在の角度
+	float angularVelocity; // 角度速w
 };
 
 #pragma region /// 座標変換 ///
@@ -194,10 +204,13 @@ Vector3 Leap(const Vector3& v1, const Vector3& v2, float t);
 Vector3 CubicBezier(const Vector3& P0, const Vector3& P1, const Vector3& P2, float t);
 
 // ばねの実装
-void SpringMove(Spring& spring, Ball& ball, float t);
+void SpringMove(Spring& spring, Ball& ball, Vector3 gravity, float t);
 
 // 角速度の実装(円運動)
 void AngularMove(Angular& angular, Vector3& position, Vector3& center, float deltaTime);
 
 // 振り子の実装
 void PendulumMove(Pendulum& pendulum, Vector3& position, float gravity, float deltaTime);
+
+// 円錐振り子の実装
+void ConicalPendulumMove(ConicalPendulum& pendulum, Vector3& position, float gravity, float deltaTime);
