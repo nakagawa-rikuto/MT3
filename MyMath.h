@@ -88,7 +88,7 @@ struct Ball {
 	Vector3 acceleration; // 加速度
 	float mass; // 質量
 	float radius; // 半径
-	float color; // 色
+	unsigned int color; // 色
 };
 
 // 角速度
@@ -214,3 +214,6 @@ void PendulumMove(Pendulum& pendulum, Vector3& position, float gravity, float de
 
 // 円錐振り子の実装
 void ConicalPendulumMove(ConicalPendulum& pendulum, Vector3& position, float gravity, float deltaTime);
+
+// 反射ベクトルを求める関数
+Vector3 Reflect(const Vector3& input, const Vector3& normal);

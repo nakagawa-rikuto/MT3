@@ -480,3 +480,11 @@ void ConicalPendulumMove(ConicalPendulum& pendulum, Vector3& position, float gra
 	position.y = pendulum.anchor.y - height;
 	position.z = pendulum.anchor.z - std::sin(pendulum.angle) * radius;
 }
+
+// 反射ベクトルを求める関数
+
+Vector3 Reflect(const Vector3& input, const Vector3& normal) {
+	
+	float dotProduct = Dot(input, normal);
+	return input - Vector3(2 * dotProduct) * normal;
+}

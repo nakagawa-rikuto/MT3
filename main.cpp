@@ -16,21 +16,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	char keys[256] = {0};
 	char preKeys[256] = {0};
 
-	Ball ball{};
-	ball.position = { 0.0f, 0.0f, 0.0f };
-	ball.mass = 2.0f;
-	ball.radius = 0.05f;
-	ball.color = BLUE;
-
-	ConicalPendulum pendulum{
-		.anchor = {0.0f, 1.0f, 0.0f},
-		.length = 0.8f,
-		.halfApexAngle = 0.7f,
-		.angle = 0.0f,
-		.angularVelocity = 0.0f
+	Plane plane{
+		.normal = Normalize({-0.2f, 0.8f, -0.3f}),
+		.distance = 0.0f
 	};
 
-	float gravity = 9.8f;
+	Ball ball{};
+	ball.position = { 0.8f, 1.2f, 0.3f };
+	ball.acceleration = { 0.0f, -9.8f, 0.0f };
+	ball.mass = 2.0f;
+	ball.radius = 0.05f;
+	ball.color = WHITE;
 
 	float deltaTime = 1.0f / 60.0f;
 
@@ -72,7 +68,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		if (isStart) {
 
-			ConicalPendulumMove(pendulum, ball.position, gravity, deltaTime);
+			ball.velocity += ball.acceleration * deltaTime;
+			ball.position += ball.velocity * deltaTime;
+			if(IsCollision(Sphere{ball.position, ball.radius}, plane)){
+				Vector3 reflected = Reflect(ball.velocity, plane.normal);
+				Vector3 projectionNormal = Project(reflected, plane.normal);
+				Vector3 movingDirection = reflected - projectionNormal;
+				ball.velocity = projectionNormal * movingDirection;
+			}
 		}
 
 
@@ -104,7 +107,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		DrawGrid(wvpMatrix, viewportMatrix);
 		DrawSphere(sphere, wvpMatrixSphere, viewportMatrix, static_cast<int>(ball.color));
-		DrawLine(ball.position, pendulum.anchor, wvpMatrix, viewportMatrix, wvpMatrix, viewportMatrix, WHITE);
+		DrawPlane(plane, wvpMatrix, viewportMatrix, WHITE);
 
 		///
 		/// ↑描画処理ここまで
