@@ -98,6 +98,14 @@ struct Angular {
 	float radius;
 };
 
+struct Pendulum {
+	Vector3 anchor;  // アンカーポイント
+	float length;    // 紐の長さ
+	float angle;     // 現在の角度
+	float angleVelocity;        // 角速度w 
+	float angularAcceleration;  // 角加速度
+};
+
 #pragma region /// 座標変換 ///
 // 平行移動
 Matrix4x4 MakeTranslateMatrix(const Vector3& translate);
@@ -190,3 +198,6 @@ void SpringMove(Spring& spring, Ball& ball, float t);
 
 // 角速度の実装(円運動)
 void AngularMove(Angular& angular, Vector3& position, Vector3& center, float deltaTime);
+
+// 振り子の実装
+void PendulumMove(Pendulum& pendulum, Vector3& position, float gravity, float deltaTime);

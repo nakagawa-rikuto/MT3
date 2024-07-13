@@ -449,6 +449,19 @@ void AngularMove(Angular& angular, Vector3& position, Vector3& center, float del
 	angular.angle += angular.velocity * deltaTime;
 
 	position.x = center.x + std::cos(angular.angle) * angular.radius;
-	position.y = center.y + std::sin(angular.angle) * angular.radius;
+	position.y = center.y - std::sin(angular.angle) * angular.radius;
 	position.z = center.z;
+}
+
+// 振り子の実装
+void PendulumMove(Pendulum& pendulum, Vector3& position, float gravity, float deltaTime) {
+
+	pendulum.angularAcceleration =
+		-(gravity / pendulum.length) * std::sin(pendulum.angle);
+	pendulum.angleVelocity += pendulum.angularAcceleration * deltaTime;
+	pendulum.angle += pendulum.angleVelocity * deltaTime;
+
+	position.x = pendulum.anchor.x + std::sin(pendulum.angle) * pendulum.length;
+	position.y = pendulum.anchor.y - std::cos(pendulum.angle) * pendulum.length;
+	position.z = pendulum.anchor.z;
 }

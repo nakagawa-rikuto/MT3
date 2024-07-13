@@ -17,27 +17,24 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	char preKeys[256] = {0};
 
 	Ball ball{};
-	ball.position = { 0.8f, 0.0f, 0.0f };
+	ball.position = { 0.0f, 0.0f, 0.0f };
 	ball.mass = 2.0f;
 	ball.radius = 0.05f;
 	ball.color = BLUE;
 
-	//float angularVelocity = 3.14f;
-	//float angle = 0.0f;
-
-	//float r = 0.8f; // まわる円の半径
-
-	Angular angular{
-		.velocity = 3.14f,
-		.angle = 0.0f,
-		.radius = 0.8f
+	Pendulum pendulum{
+		.anchor = {0.0f, 1.0f, 0.0f},
+		.length = 0.8f,
+		.angle = 0.7f,
+		.angleVelocity = 0.0f,
+		.angularAcceleration = 0.0f
 	};
+
+	float gravity = 9.8f;
 
 	float deltaTime = 1.0f / 60.0f;
 
 	bool isStart = false;
-
-	Vector3 center = { 0.0f, 0.0f, 0.0f };
 
 	Vector3 cameraTranslate = { 0.0f, 3.0f, -10.0f };
 	Vector3 cameraRotate = { 0.26f, 0.0f, 0.0f };
@@ -75,7 +72,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		if (isStart) {
 
-			AngularMove(angular, ball.position, center, deltaTime);
+			PendulumMove(pendulum, ball.position, gravity, deltaTime);
 		}
 
 
@@ -107,7 +104,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		DrawGrid(wvpMatrix, viewportMatrix);
 		DrawSphere(sphere, wvpMatrixSphere, viewportMatrix, static_cast<int>(ball.color));
-		DrawLine(ball.position, center, wvpMatrix, viewportMatrix, wvpMatrix, viewportMatrix, WHITE);
+		DrawLine(ball.position, pendulum.anchor, wvpMatrix, viewportMatrix, wvpMatrix, viewportMatrix, WHITE);
 
 		///
 		/// ↑描画処理ここまで
