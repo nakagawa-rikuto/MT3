@@ -17,16 +17,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	char preKeys[256] = {0};
 	
 	Spring spring{};
-	spring.anchor = { 0.0f, 0.0f, 0.0f };
-	spring.naturalLength = 1.0f;
+	spring.anchor = { 0.0f, 1.0f, 0.0f };
+	spring.naturalLength = 0.7f;
 	spring.stiffness = 100.0f;
 	spring.dampingCoefficient = 2.0f;
 
 	Ball ball{};
-	ball.position = { 1.2f, 0.0f, 0.0f };
+	ball.position = { 0.8f, 0.2f, 0.0f };
 	ball.mass = 2.0f;
 	ball.radius = 0.05f;
 	ball.color = BLUE;
+
+	const Vector3 kGravity{ 0.0f, -9.8f, 0.0f };
 
 	float deltaTime = 1.0f / 60.0f;
 
@@ -80,6 +82,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				Vector3 force = restoringForce + dampingForce;
 				ball.acceleration = force / ball.mass;
 			}
+
+			// 重力を追加する
+			ball.acceleration += kGravity;
 
 			// 加速度も速度もどちらとも秒を基準とした値である
 			// それが、1/60秒間(deltaTime)運用されたと考える
