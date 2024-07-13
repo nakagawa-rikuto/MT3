@@ -175,5 +175,8 @@ Vector3 Perpendicular(const Vector3& vector);
 // 線形補間の関数
 Vector3 Leap(const Vector3& v1, const Vector3& v2, float t);
 
-// 3次元のベジュ
+// 3次元のベジュの線形補間の関数
 Vector3 CubicBezier(const Vector3& P0, const Vector3& P1, const Vector3& P2, float t);
+
+// ばねの実装
+void SpringMove(Spring& spring, Ball& ball, float t);

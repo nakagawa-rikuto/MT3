@@ -15,15 +15,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// キー入力結果を受け取る箱
 	char keys[256] = {0};
 	char preKeys[256] = {0};
-	
-	Spring spring{};
-	spring.anchor = { 0.0f, 0.0f, 0.0f };
-	spring.naturalLength = 1.0f;
-	spring.stiffness = 100.0f;
-	spring.dampingCoefficient = 2.0f;
 
 	Ball ball{};
-	ball.position = { 1.2f, 0.0f, 0.0f };
+	ball.position = { 0.8f, 0.0f, 0.0f };
 	ball.mass = 2.0f;
 	ball.radius = 0.05f;
 	ball.color = BLUE;
@@ -31,6 +25,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	float deltaTime = 1.0f / 60.0f;
 
 	bool isStart = false;
+
+	float angularVelocity = 3.14f;
+	float angle = 0.0f;
+
+	float r = 0.8f; // まわる円の半径
+	Vector3 center = { 0.0f, 0.0f, 0.0f };
 
 	Vector3 cameraTranslate = { 0.0f, 3.0f, -10.0f };
 	Vector3 cameraRotate = { 0.26f, 0.0f, 0.0f };
@@ -67,24 +67,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		*/ //////////////////////////////////
 
 		if (isStart) {
-			Vector3 diff = ball.position - spring.anchor;
-			float length = Length(diff);
-			if (length != 0.0f) {
-				Vector3 direction = Normalize(diff);
-				Vector3 restPosition = spring.anchor + direction * spring.naturalLength;
-				Vector3 displacement = (ball.position - restPosition) * length;
-				Vector3 restoringForce = displacement * -spring.stiffness;
-				// 減衰抵抗を計算する
-				Vector3 dampingForce = ball.velocity * -spring.dampingCoefficient;
-				// 減衰抵抗も加味して、物体にかかる力を決定する。
-				Vector3 force = restoringForce + dampingForce;
-				ball.acceleration = force / ball.mass;
-			}
+			
+			angle += angularVelocity * deltaTime;
 
-			// 加速度も速度もどちらとも秒を基準とした値である
-			// それが、1/60秒間(deltaTime)運用されたと考える
-			ball.velocity += ball.acceleration * deltaTime;
-			ball.position += ball.velocity * deltaTime;
+			ball.position.x = center.x + std::cos(angle) * r;
+			ball.position.y = center.y + std::sin(angle) * r;
+			ball.position.z = center.z;
 		}
 
 
@@ -116,7 +104,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		DrawGrid(wvpMatrix, viewportMatrix);
 		DrawSphere(sphere, wvpMatrixSphere, viewportMatrix, static_cast<int>(ball.color));
-		DrawLine(ball.position, spring.anchor, wvpMatrix, viewportMatrix, wvpMatrix, viewportMatrix, WHITE);
+		DrawLine(ball.position, center, wvpMatrix, viewportMatrix, wvpMatrix, viewportMatrix, WHITE);
 
 		///
 		/// ↑描画処理ここまで
