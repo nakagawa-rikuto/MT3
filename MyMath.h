@@ -91,6 +91,13 @@ struct Ball {
 	float color; // 色
 };
 
+// 角速度
+struct Angular {
+	float velocity;
+	float angle;
+	float radius;
+};
+
 #pragma region /// 座標変換 ///
 // 平行移動
 Matrix4x4 MakeTranslateMatrix(const Vector3& translate);
@@ -180,3 +187,6 @@ Vector3 CubicBezier(const Vector3& P0, const Vector3& P1, const Vector3& P2, flo
 
 // ばねの実装
 void SpringMove(Spring& spring, Ball& ball, float t);
+
+// 角速度の実装(円運動)
+void AngularMove(Angular& angular, Vector3& position, Vector3& center, float deltaTime);

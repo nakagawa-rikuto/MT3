@@ -22,14 +22,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	ball.radius = 0.05f;
 	ball.color = BLUE;
 
+	//float angularVelocity = 3.14f;
+	//float angle = 0.0f;
+
+	//float r = 0.8f; // まわる円の半径
+
+	Angular angular{
+		.velocity = 3.14f,
+		.angle = 0.0f,
+		.radius = 0.8f
+	};
+
 	float deltaTime = 1.0f / 60.0f;
 
 	bool isStart = false;
 
-	float angularVelocity = 3.14f;
-	float angle = 0.0f;
-
-	float r = 0.8f; // まわる円の半径
 	Vector3 center = { 0.0f, 0.0f, 0.0f };
 
 	Vector3 cameraTranslate = { 0.0f, 3.0f, -10.0f };
@@ -67,12 +74,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		*/ //////////////////////////////////
 
 		if (isStart) {
-			
-			angle += angularVelocity * deltaTime;
 
-			ball.position.x = center.x + std::cos(angle) * r;
-			ball.position.y = center.y + std::sin(angle) * r;
-			ball.position.z = center.z;
+			AngularMove(angular, ball.position, center, deltaTime);
 		}
 
 

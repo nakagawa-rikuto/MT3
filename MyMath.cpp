@@ -442,3 +442,13 @@ void SpringMove(Spring& spring, Ball& ball, float deltaTime) {
 	ball.velocity += ball.acceleration * deltaTime;
 	ball.position += ball.velocity * deltaTime;
 }
+
+// 角速度の実装(円運動)
+void AngularMove(Angular& angular, Vector3& position, Vector3& center, float deltaTime) {
+
+	angular.angle += angular.velocity * deltaTime;
+
+	position.x = center.x + std::cos(angular.angle) * angular.radius;
+	position.y = center.y + std::sin(angular.angle) * angular.radius;
+	position.z = center.z;
+}
