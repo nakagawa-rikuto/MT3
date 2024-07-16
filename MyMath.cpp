@@ -482,9 +482,20 @@ void ConicalPendulumMove(ConicalPendulum& pendulum, Vector3& position, float gra
 }
 
 // 反射ベクトルを求める関数
-
 Vector3 Reflect(const Vector3& input, const Vector3& normal) {
 	
 	float dotProduct = Dot(input, normal);
 	return input - Vector3(2 * dotProduct) * normal;
+}
+
+// 指定された範囲内に制限する関数(クランプ)
+float Clamp(float Value, float Max, float Min) {
+	
+	if (Value > Max) {
+		return Max;
+	} else if (Value < Min) {
+		return Min;
+	} else {
+		return Value;
+	}
 }

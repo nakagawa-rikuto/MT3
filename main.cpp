@@ -13,11 +13,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Novice::Initialize(kWindowTitle, 1280, 720);
 
 	// キー入力結果を受け取る箱
-	char keys[256] = {0};
-	char preKeys[256] = {0};
+	char keys[256] = { 0 };
+	char preKeys[256] = { 0 };
 
 	Plane plane{
-		.normal = Normalize({-0.2f, 0.8f, -0.3f}),
+		.normal = {-0.2f, 0.9f, -0.3f},
 		.distance = 0.0f
 	};
 
@@ -49,13 +49,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 
 		/* ///////////////////////////////
-		            ImGui
+					ImGui
 		*/ ///////////////////////////////
 #ifdef  _DEBUG
 
 		ImGui::Begin("Window");
 
 		ImGui::DragFloat3("Ball.position", &ball.position.x, 0.01f);
+		ImGui::DragFloat3("Camera", &cameraTranslate.x, 0.1f);
+		ImGui::DragFloat3("Camera.Rotate", &cameraRotate.x, 0.01f);
 		ImGui::Checkbox("isStart", &isStart);
 
 		ImGui::End();
@@ -70,14 +72,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			ball.velocity += ball.acceleration * deltaTime;
 			ball.position += ball.velocity * deltaTime;
-			if(IsCollision(Sphere{ball.position, ball.radius}, plane)){
+			if (IsCollision(Sphere{ ball.position, ball.radius }, plane)) {
 				Vector3 reflected = Reflect(ball.velocity, plane.normal);
 				Vector3 projectionNormal = Project(reflected, plane.normal);
 				Vector3 movingDirection = reflected - projectionNormal;
 				ball.velocity = projectionNormal * movingDirection;
+				ball.color = RED;
+			} else {
+				ball.color = WHITE;
 			}
 		}
-
 
 		// 行列の計算
 		Matrix4x4 worldMatrix = MakeAffineMatrix({ 1.0f, 1.0f,1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f });

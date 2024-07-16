@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <algorithm>
 #include <vector>
+#include <algorithm>
 
 /// <summary>
 /// 3x3行列
@@ -116,6 +117,12 @@ struct ConicalPendulum {
 	float angularVelocity; // 角度速w
 };
 
+// カプセル
+struct Capsule {
+	Segment segment;
+	float radius;
+};
+
 #pragma region /// 座標変換 ///
 // 平行移動
 Matrix4x4 MakeTranslateMatrix(const Vector3& translate);
@@ -217,3 +224,6 @@ void ConicalPendulumMove(ConicalPendulum& pendulum, Vector3& position, float gra
 
 // 反射ベクトルを求める関数
 Vector3 Reflect(const Vector3& input, const Vector3& normal);
+
+// 指定された範囲内に制限する関数(クランプ)
+float Clamp(float Value, float Max, float Min);

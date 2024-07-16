@@ -26,20 +26,23 @@ bool IsCollision(const Sphere& s1, const Sphere& s2) {
 // 球と平面の当たり判定
 bool IsCollision(const Sphere& sphere, const Plane& plane) {
 
-	// 平面の法線の正規化
-	Vector3 normalizePlane = Normalize(plane.normal);
+	 // 平面の法線を正規化
+    Vector3 normalizedNormal = Normalize(plane.normal);
 
-	// 球の中心と平面との距離を計算
-	float distanceFromCenterToPlane = Dot(sphere.center, normalizePlane) - plane.distance;
 
-	// 球と中心から平面までの距離の絶対値が球の半径以下ならば衝突
-	if (std::abs(distanceFromCenterToPlane) <= sphere.radius) {
-
-		return true;
-	} else {
-
-		return false;
-	}
+    
+    // 球の中心から平面までの距離
+    float distanceFromCenterToPlane = Dot(sphere.center, normalizedNormal) - plane.distance;
+    
+    // 球の半径が平面に対してどれだけの範囲にあるかをチェックする
+    float effectiveRadius = sphere.radius * fabsf(Dot(normalizedNormal, sphere.center)) / Length(normalizedNormal);
+    
+    // 球の中心から平面までの距離の絶対値が球の有効な半径以下であれば衝突していると判断する
+    if (distanceFromCenterToPlane <= effectiveRadius) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 // 線と平面の当たり判定
