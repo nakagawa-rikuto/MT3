@@ -17,7 +17,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	char preKeys[256] = { 0 };
 
 	Plane plane{
-		.normal = {-0.2f, 1.2f, -0.3f},
+		.normal = Normalize({-0.2f, 1.2f, -0.3f}),
 		.distance = 0.0f
 	};
 
@@ -69,14 +69,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		*/ //////////////////////////////////
 
 		if (isStart) {
-
+			// 速度と位置の更新
 			ball.velocity += ball.acceleration * deltaTime;
 			ball.position += ball.velocity * deltaTime;
+
+			// 衝突判定
 			if (IsCollision(Sphere{ ball.position, ball.radius }, plane)) {
+				// 反射ベクトルの計算
 				Vector3 reflected = Reflect(ball.velocity, plane.normal);
-				Vector3 projectionNormal = Project(reflected, plane.normal);
-				Vector3 movingDirection = reflected - projectionNormal;
-				ball.velocity = projectionNormal * movingDirection;
+				// ボールの新しい速度を反射ベクトルに設定
+				ball.velocity = reflected;
 				ball.color = RED;
 			} else {
 				ball.color = WHITE;

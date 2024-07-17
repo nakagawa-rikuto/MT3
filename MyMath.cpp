@@ -296,18 +296,20 @@ Matrix4x4 CreateOBBWorldMatrix(const OBB& obb) {
 // 正射影ベクトル
 Vector3 Project(const Vector3& v1, const Vector3& v2) {
 
-	// ベクトルv2の単位ベクトルを計算する
-	float lengthSquared =
-		sqrt(v2.x * v2.x + v2.y * v2.y + v2.z * v2.z) * sqrt(v2.x * v2.x + v2.y * v2.y + v2.z * v2.z);
+	// v2の長さの二乗を計算する
+	float lengthSquared = v2.x * v2.x + v2.y * v2.y + v2.z * v2.z;
 
-	Vector3 unitV2 =
-	{ v2.x * (1.0f / lengthSquared), v2.y * (1.0f / lengthSquared), v2.z * (1.0f / lengthSquared) };
+	// v2がゼロベクトルでないことを確認する
+	if (lengthSquared == 0.0f) {
+		// v2がゼロベクトルの場合、結果はゼロベクトル
+		return Vector3(0.0f, 0.0f, 0.0f);
+	}
 
-	// v1をv2に対して正射影する
-	float projectLength =
-	{ v1.x * unitV2.x + v1.y * unitV2.y + v1.z * unitV2.z };
+	// v1をv2に対して正射影するスカラー量を計算する
+	float projectLength = (v1.x * v2.x + v1.y * v2.y + v1.z * v2.z) / lengthSquared;
 
-	return Vector3(unitV2.x * projectLength, unitV2.y * projectLength, unitV2.z * projectLength);
+	// 正射影ベクトルを計算する
+	return Vector3(v2.x * projectLength, v2.y * projectLength, v2.z * projectLength);
 }
 
 // 最近接点(線	)
@@ -484,8 +486,12 @@ void ConicalPendulumMove(ConicalPendulum& pendulum, Vector3& position, float gra
 // 反射ベクトルを求める関数
 Vector3 Reflect(const Vector3& input, const Vector3& normal) {
 	
+	// 入力ベクトルと法線ベクトルのドット積を計算する
 	float dotProduct = Dot(input, normal);
-	return input - Vector3(2 * dotProduct) * normal;
+
+	// 反射ベクトルを計算する
+	Vector3 reflect = input - normal * (2.0f * dotProduct);
+	return reflect;
 }
 
 // 指定された範囲内に制限する関数(クランプ)
