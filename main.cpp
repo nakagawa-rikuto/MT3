@@ -17,7 +17,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	char preKeys[256] = { 0 };
 
 	Plane plane{
-		.normal = Normalize({-0.2f, 1.2f, -0.3f}),
+		.normal = Normalize({-0.2f, 0.9f, -0.3f}),
 		.distance = 0.0f
 	};
 
